@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{ABE57787-3247-497C-A31D-39D91E1F4040}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DSmoove.Core</RootNamespace>
+    <AssemblyName>DSmoove.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bencode">
+      <HintPath>..\packages\Bencode.1.1.0\lib\Bencode.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="Stateless">
+      <HintPath>..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UriQueryBuilder">
+      <HintPath>..\packages\UriQueryBuilder.1.0.1\lib\UriQueryBuilder.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Config\IocModule.cs" />
+    <Compile Include="Connections\FileConnection.cs" />
+    <Compile Include="Connections\IncomingConnection.cs" />
+    <Compile Include="Entities\AvailablePiece.cs" />
+    <Compile Include="Entities\Block.cs" />
+    <Compile Include="Entities\DataRange.cs" />
+    <Compile Include="Entities\PieceList.cs" />
+    <Compile Include="Entities\TorrentFile.cs" />
+    <Compile Include="Entities\FilePart.cs" />
+    <Compile Include="Entities\Metadata.cs" />
+    <Compile Include="Entities\Peer.cs" />
+    <Compile Include="Entities\Piece.cs" />
+    <Compile Include="Entities\Torrent.cs" />
+    <Compile Include="Extensions\NetworkStreamExtensions.cs" />
+    <Compile Include="Handlers\PeerHandler.cs" />
+    <Compile Include="Interfaces\IHandlePeer.cs" />
+    <Compile Include="Interfaces\IHandlePeerMessages.cs" />
+    <Compile Include="Managers\FileManager.cs" />
+    <Compile Include="Managers\MetadataManager.cs" />
+    <Compile Include="Managers\PieceManager.cs" />
+    <Compile Include="Providers\IProvideTorrent.cs" />
+    <Compile Include="Helpers\MetadataDecoder.cs" />
+    <Compile Include="PeerCommands\BitFieldCommand.cs" />
+    <Compile Include="PeerCommands\CancelCommand.cs" />
+    <Compile Include="PeerCommands\ChokeCommand.cs" />
+    <Compile Include="PeerCommands\HandshakeCommand.cs" />
+    <Compile Include="PeerCommands\HaveCommand.cs" />
+    <Compile Include="PeerCommands\InterestedCommand.cs" />
+    <Compile Include="PeerCommands\NotInterested.cs" />
+    <Compile Include="PeerCommands\BasePeerCommand.cs" />
+    <Compile Include="PeerCommands\PieceCommand.cs" />
+    <Compile Include="PeerCommands\PortCommand.cs" />
+    <Compile Include="PeerCommands\RequestCommand.cs" />
+    <Compile Include="PeerCommands\UnchokeCommand.cs" />
+    <Compile Include="Connections\PeerConnection.cs" />
+    <Compile Include="Managers\TransferManager.cs" />
+    <Compile Include="Config\Settings.cs" />
+    <Compile Include="Managers\TorrentManager.cs" />
+    <Compile Include="Enums\TorrentState.cs" />
+    <Compile Include="Managers\TrackerManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\UriTorrentProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
