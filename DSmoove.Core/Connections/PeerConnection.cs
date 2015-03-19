@@ -21,8 +21,9 @@ namespace DSmoove.Core.Connections
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private TcpClient _tcpClient;
         private bool _incoming;
-        private IPAddress _ipAddress;
-        private int _port;
+
+        public IPAddress Address { get; private set; }
+        public int Port { get; private set; }
 
         private IHandlePeerMessages _messageHandler;
 
@@ -30,8 +31,8 @@ namespace DSmoove.Core.Connections
 
         public PeerConnection(IPAddress ipAddress, int port, IHandlePeerMessages messageHandler)
         {
-            _ipAddress = ipAddress;
-            _port = port;
+            Address = ipAddress;
+            Port = port;
             _incoming = false;
             _messageHandler = messageHandler;
         }
@@ -40,8 +41,8 @@ namespace DSmoove.Core.Connections
         {
             _tcpClient = tcpClient;
 
-            _ipAddress = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address;
-            _port = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port;
+            Address = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address;
+            Port = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port;
             _incoming = true;
 
             _messageHandler = messageHandler;
@@ -53,17 +54,17 @@ namespace DSmoove.Core.Connections
             {
                 if (_tcpClient == null)
                 {
-                    log.DebugFormat("Connecting to peer {0}:{1}", _ipAddress, _port);
+                    log.DebugFormat("Connecting to peer {0}:{1}", Address, Port);
                     _tcpClient = new TcpClient();
-                    await _tcpClient.ConnectAsync(_ipAddress, _port);
+                    await _tcpClient.ConnectAsync(Address, Port);
                     _readTask = ReadAsync();
                 }
 
-                log.DebugFormat("Connected to peer {0}:{1}, starting read.", _ipAddress, _port);
+                log.DebugFormat("Connected to peer {0}:{1}, starting read.", Address, Port);
             }
             catch (Exception e)
             {
-                log.WarnFormat("Could not connect to {0}:{1} ({2})", _ipAddress, _port, e.Message);
+                log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
                 return false;
             }
 
@@ -80,7 +81,7 @@ namespace DSmoove.Core.Connections
             }
             catch (Exception e)
             {
-                log.WarnFormat("Could not send data to {0}:{1} ({2})", _ipAddress.ToString(), _port, e.Message);
+                log.WarnFormat("Could not send data to {0}:{1} ({2})", Address, Port, e.Message);
             }
         }
 
@@ -132,7 +133,7 @@ namespace DSmoove.Core.Connections
             }
             catch (IOException e)
             {
-                log.WarnFormat("Disconnected from {0}:{1} ({2})", _ipAddress, _port, e.Message);
+                log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
             }
         }
 
@@ -148,7 +149,6 @@ namespace DSmoove.Core.Connections
         }
     }
 }
-
 //        
 
 //       
