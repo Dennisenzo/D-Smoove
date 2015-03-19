@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DSmoove.Core.Managers.TorrentManager" Collapsed="true">
+    <Position X="3" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAIgAAIACAAAAoAAIAACIQAAAAgAAAAIAEAIAAAIAA=</HashCode>
+      <FileName>Managers\TorrentManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSmoove.Core.Managers.TrackerManager" Collapsed="true">
+    <Position X="5.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAQAAAAAACCAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Managers\TrackerManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSmoove.Core.Managers.FileManager" Collapsed="true">
+    <Position X="8.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAACAAAAAgAAAAAAAAABAAAAAAAAAAAgAIAA=</HashCode>
+      <FileName>Managers\FileManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSmoove.Core.Managers.OldTransferManager" Collapsed="true">
+    <Position X="8.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABgAAAAIACSgACIAAABACAAEAEEAAJEACABEgAAAAAQ=</HashCode>
+      <FileName>Managers\OldTransferManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSmoove.Core.Managers.DownloadManager" Collapsed="true">
+    <Position X="9" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAgAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Managers\DownloadManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSmoove.Core.Managers.UploadManager" Collapsed="true">
+    <Position X="10.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Managers\UploadManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

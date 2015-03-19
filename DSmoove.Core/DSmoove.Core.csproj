@@ -78,10 +78,12 @@
     <Compile Include="Interfaces\IHandlePeerConnection.cs" />
     <Compile Include="Interfaces\IHandlePeerMessages.cs" />
     <Compile Include="Managers\BaseDataManager.cs" />
+    <Compile Include="Managers\ConnectionManager.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\FileManager.cs" />
     <Compile Include="Managers\MetadataManager.cs" />
     <Compile Include="Managers\PieceManager.cs" />
+    <Compile Include="Managers\TransferManager.cs" />
     <Compile Include="Managers\UploadManager.cs" />
     <Compile Include="Providers\IProvideTorrent.cs" />
     <Compile Include="Helpers\MetadataDecoder.cs" />
@@ -98,7 +100,7 @@
     <Compile Include="PeerCommands\RequestCommand.cs" />
     <Compile Include="PeerCommands\UnchokeCommand.cs" />
     <Compile Include="Connections\PeerConnection.cs" />
-    <Compile Include="Managers\TransferManager.cs" />
+    <Compile Include="Managers\OldTransferManager.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Managers\TorrentManager.cs" />
     <Compile Include="Enums\TorrentState.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="Providers\UriTorrentProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
