@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Interfaces
 {
-    public delegate void PeerConnected();
-    public delegate void PeerDisconnected();
     public delegate void KeepAliveReceived();
     public delegate void ChokeReceived();
     public delegate void UnchokeReceived();
@@ -33,9 +31,6 @@ namespace DSmoove.Core.Interfaces
         void Unchoke();
         void Interested();
         void NotInterested();
-
-        event PeerConnected PeerConnectedEvent;
-        event PeerDisconnected PeerDisconnectedEvent;
 
         event KeepAliveReceived KeepAliveReceivedEvent;
         event ChokeReceived ChokeReceivedEvent;

@@ -1,8 +1,10 @@
 ﻿using DSmoove.Core.Connections;
+using DSmoove.Core.Entities;
 using DSmoove.Core.Interfaces;
 using DSmoove.Core.PeerCommands;
 using log4net;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,18 +20,62 @@ namespace DSmoove.Core.Handlers
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private PeerConnection _connection;
 
-        public PeerHandler(TcpClient tcpClient)
+        public Peer Peer { get; private set; }
+        private byte[] _torrentHash;
+        private bool _incoming;
+
+        public PeerHandler(Peer peer, TcpClient tcpClient, byte[] torrentHash)
         {
+            Peer = peer;
+            _torrentHash = torrentHash;
             _connection = new PeerConnection(tcpClient, this);
+            _incoming = true;
         }
 
-        public PeerHandler(IPAddress ipAddress, int port)
+        public PeerHandler(Peer peer, byte[] torrentHash)
         {
-            _connection = new PeerConnection(ipAddress, port, this);
+            Peer = peer;
+            _torrentHash = torrentHash;
+            _connection = new PeerConnection(Peer.IpAddress, Peer.Port, this);
+            _incoming = false;
+
+            _connection.PeerConnectedEvent += PeerIsConnected;
+            _connection.PeerDisconnectedEvent += PeerIsDisconnected;
+        }
+
+        private void PeerIsDisconnected()
+        {
+            Peer.Status = PeerStatus.Failed;
+        }
+
+        private void PeerIsConnected()
+        {
+            Peer.Status = PeerStatus.Connected;
+
+            Task handShakeTask = SendHandshake();
+            Task bitFieldTask = SendBitfield();
+
+           // task.Wait();
+        }
+
+        private async Task SendBitfield()
+        {
+            log.DebugFormat("Sending Handshake to {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
+        }
+
+        private async Task SendHandshake()
+        {
+            log.DebugFormat("Sending Handshake to {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
+            HandshakeCommand handshake = new HandshakeCommand()
+                {
+                    InfoHash = _torrentHash
+                };
+            await _connection.SendAsync(handshake.ToByteArray());
         }
 
         public async Task Start()
         {
+            Peer.Status = PeerStatus.Connecting;
             await _connection.Connect();
         }
 
@@ -76,7 +122,19 @@ namespace DSmoove.Core.Handlers
 
         public void HandleHandshakeMessage(byte[] messageData)
         {
-            throw new NotImplementedException();
+            HandshakeCommand handShake = new HandshakeCommand();
+            handShake.FromByteArray(messageData);
+
+            log.DebugFormat("Received Handshake message from {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
+
+            if (HandShakeReceivedEvent != null)
+            {
+                HandShakeReceivedEvent(handShake);
+            }
+            if (_incoming)
+            {
+                SendHandshake();
+            }
         }
 
         public void HandlePeerMessage(byte[] messageData)
@@ -143,6 +201,10 @@ namespace DSmoove.Core.Handlers
 
                                 bitField.FromByteArray(messageData);
 
+                                Peer.BitField = bitField.Downloaded;
+
+                                log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+
                                 BitFieldReceivedEvent(bitField);
                             }
                             break;
@@ -156,6 +218,10 @@ namespace DSmoove.Core.Handlers
                                 HaveCommand have = new HaveCommand();
 
                                 have.FromByteArray(messageData);
+
+                                Peer.SetDownloaded(have.PieceIndex);
+
+                                log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
 
                                 HaveReceivedEvent(have);
                             }
@@ -183,6 +249,68 @@ namespace DSmoove.Core.Handlers
                             break;
                         }
                 }
+            }
+        }
+
+        #endregion
+
+        public async Task SetInterested(bool interested)
+        {
+            if (interested != AmInterested)
+            {
+                AmInterested = interested;
+
+                await SendInterestedAsync();
+            }
+        }
+
+        public async Task SetChoke(bool choke)
+        {
+            if (choke != AmChoking)
+            {
+                AmChoking = choke;
+                await SendChokeAsync();
+            }
+        }
+
+        #region Private Send Commands
+
+        private async Task SendInterestedAsync()
+        {
+            if (AmInterested)
+            {
+                log.DebugFormat("Sending Interested to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+                InterestedCommand command = new InterestedCommand();
+
+                await _connection.SendAsync(command.ToByteArray());
+            }
+            else
+            {
+                log.DebugFormat("Sending Not Interested to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+                NotInterestedCommand command = new NotInterestedCommand();
+
+                await _connection.SendAsync(command.ToByteArray());
+            }
+        }
+        private async Task SendChokeAsync()
+        {
+            if (AmChoking)
+            {
+                log.DebugFormat("Sending Unchoke to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+                UnchokeCommand command = new UnchokeCommand();
+
+                await _connection.SendAsync(command.ToByteArray());
+            }
+            else
+            {
+                log.DebugFormat("Sending Choke to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+                ChokeCommand command = new ChokeCommand();
+
+                await _connection.SendAsync(command.ToByteArray());
             }
         }
 

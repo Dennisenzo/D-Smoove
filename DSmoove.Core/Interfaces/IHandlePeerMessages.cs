@@ -10,6 +10,6 @@ namespace DSmoove.Core.Interfaces
     public interface IHandlePeerMessages
     {
         void HandlePeerMessage(byte[] messageData);
-        void HandleHandshakeMessage(byte[] handshakeData);
+       void HandleHandshakeMessage(byte[] handshakeData);
     }
 }

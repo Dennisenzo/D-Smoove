@@ -32,7 +32,7 @@ namespace DSmoove.Core.Managers
 
         public void Start()
         {
-            Update(null,null);
+            Update(null, null);
         }
 
         public void Update(object sender, ElapsedEventArgs e)
@@ -68,12 +68,7 @@ namespace DSmoove.Core.Managers
 
                     ushort port = (ushort)BitConverter.ToInt16(portBytes, 0);
 
-                    if (!_torrent.Peers.Any(p => p.Equals(ip, port)))
-                    {
-                        Peer peer = new Peer(ip, port, _torrent);
-
-                        _torrent.Peers.Add(peer);
-                    }
+                    _torrent.AddAndGetPeer(ip, port);
                 }
             }
             else

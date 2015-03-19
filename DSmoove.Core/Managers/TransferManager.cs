@@ -24,32 +24,26 @@ namespace DSmoove.Core.Managers
 
         private Timer _commandTimer;
 
-        private IncomingConnection _incomingConnections;
+        private IncomingPeerConnection _incomingConnections;
 
         private List<PeerHandler> _peerHandlers;
 
         private FileManager _fileManager;
+
+                private int _maxConnections = 10;
 
         public TransferManager(Torrent torrent, FileManager fileManager)
         {
             _torrent = torrent;
             _fileManager = fileManager;
             _peerHandlers = new List<PeerHandler>();
-            _incomingConnections = new IncomingConnection();
+            _incomingConnections = new IncomingPeerConnection();
             _incomingConnections.NewConnectionEvent += SetupIncomingPeerHandler;
         }
 
         public void Start()
         {
             _incomingConnections.StartListening();
-            foreach (var peer in _torrent.Peers.Where(p => p.Status == PeerStatus.Disconnected))
-            {
-                Task.Factory.StartNew(() =>
-                    {
-                        SetupOutgoingPeerHandler(peer.IpAddress, peer.Port);
-                    });
-            }
-
             _commandTimer = new Timer(10000);
             _commandTimer.Elapsed += CommandTimerElapsed;
             _commandTimer.AutoReset = false;
@@ -58,64 +52,103 @@ namespace DSmoove.Core.Managers
 
         private void CommandTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            SetInterested();
-            SetChoke();
+            Task connectTask = ConnectPeers();
+            Task interestedTask = SetInterested();
+            Task chokeTask = SetChoke();
+            
+            Task.WaitAll(connectTask, interestedTask, chokeTask);
+
             _commandTimer.Start();
         }
 
-        private async void SetInterested()
+        private Task ConnectPeers()
         {
-            //foreach (var peer in _torrent.Peers.Where(p => p.Status == PeerStatus.Connected))
-            //{
-            //    var interestedIndexes = peer.GetInterestedPieces(_torrent.BitField);
-            //    var peerConnection = _connections.Single(p => p.Peer == peer);
+            return Task.Run(() =>
+            {
+                List<Task> connectTasks = new List<Task>();
+                var disconnectedPeers = _torrent.Peers.Where(p => p.Status == PeerStatus.Disconnected);
 
-            //    if (interestedIndexes.Count > 0 && !peerConnection.AmInterested)
-            //    {
-            //        await peerConnection.SetInterested(true);
-            //    }
-            //    else if (interestedIndexes.Count == 0 && peerConnection.AmInterested)
-            //    {
-            //        await peerConnection.SetInterested(false);
-            //    }
-            //}
-            //int interested = _connections.Count(c => c.AmInterested == true);
-            //log.DebugFormat("We are currently interested in {0} of {1} peers.", interested, _connections.Count);
+                foreach (var peer in disconnectedPeers)
+                {
+                    int connected = _torrent.Peers.Count(p => p.Status != PeerStatus.Disconnected && p.Status != PeerStatus.Failed);
 
-            //interested = _connections.Count(c => c.IsInterested == true);
-            //log.DebugFormat("Currently, {0} of {1} peers are interested in us.", interested, _connections.Count);
+                        if (connected >= _maxConnections)
+                    {
+                        return;
+                    }
+
+                    connectTasks.Add(SetupOutgoingPeerHandler(peer));
+                }
+
+                Task.WaitAll(connectTasks.ToArray());
+            });
         }
 
-        private async void SetChoke()
+        private async Task SetInterested()
         {
-            //foreach (var peer in _torrent.Peers.Where(p => p.Status == PeerStatus.Connected))
-            //{
-            //     var peerConnection = _connections.Single(p => p.Peer == peer);
-            //     await peerConnection.SetChoke(!peerConnection.IsInterested);
-            //}
+            foreach (var peer in _torrent.Peers.Where(p => p.Status == PeerStatus.Connected))
+            {
+                var interestedIndexes = peer.GetInterestedPieces(_torrent.BitField);
 
-            //int choking = _connections.Count(c => c.AmChoking == true);
-            //log.DebugFormat("We are currently choking {0} of {1} peers", choking, _connections.Count);
+                if (interestedIndexes.Count > 0)
+                {
+                    var peerConnection = _peerHandlers.Single(p => p.Peer == peer);
+                    await peerConnection.SetInterested(true);
+                }
+                else if (interestedIndexes.Count == 0)
+                {
+                    var peerConnection = _peerHandlers.Single(p => p.Peer == peer);
+                    await peerConnection.SetInterested(false);
+                }
+            }
+            int interested = _peerHandlers.Count(c => c.AmInterested == true);
+            log.DebugFormat("We are currently interested in {0} of {1} peers.", interested, _peerHandlers.Count);
 
-            //choking = _connections.Count(c => c.IsChoking == true);
-            //log.DebugFormat("Currently, {0} of {1} peers are choking us.", choking, _connections.Count);
+            interested = _peerHandlers.Count(c => c.IsInterested == true);
+            log.DebugFormat("Currently, {0} of {1} peers are interested in us.", interested, _peerHandlers.Count);
         }
-        private async Task SetupIncomingPeerHandler(TcpClient client)
+
+        private async Task SetChoke()
         {
-            PeerHandler peerHandler = new PeerHandler(client);
+            foreach (var peer in _torrent.Peers.Where(p => p.Status == PeerStatus.Connected))
+            {
+                 var peerHandler = _peerHandlers.Single(p => p.Peer == peer);
+                 await peerHandler.SetChoke(!peerHandler.IsInterested);
+            }
+
+            int choking = _peerHandlers.Count(c => c.AmChoking == true);
+            log.DebugFormat("We are currently choking {0} of {1} peers", choking, _peerHandlers.Count);
+
+            choking = _peerHandlers.Count(c => c.IsChoking == true);
+            log.DebugFormat("Currently, {0} of {1} peers are choking us.", choking, _peerHandlers.Count);
+        }
+
+        private Task SetupIncomingPeerHandler(TcpClient client)
+        {
+            var address = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
+            var port = ((IPEndPoint)client.Client.RemoteEndPoint).Port;
+
+            Peer peer = _torrent.AddAndGetPeer(address, port);
+
+            return SetupIncomingPeerHandler(peer, client);
+        }
+
+        private Task SetupIncomingPeerHandler(Peer peer, TcpClient client)
+        {
+            PeerHandler peerHandler = new PeerHandler(peer, client, _torrent.Metadata.Hash);
 
             _peerHandlers.Add(peerHandler);
 
-            await SetupPeerHandler(peerHandler);
+            return SetupPeerHandler(peerHandler);
         }
 
-        private async Task SetupOutgoingPeerHandler(IPAddress ipAddress, int port)
+        private Task SetupOutgoingPeerHandler(Peer peer)
         {
-            PeerHandler peerHandler = new PeerHandler(ipAddress, port);
+            PeerHandler peerHandler = new PeerHandler(peer, _torrent.Metadata.Hash);
 
             _peerHandlers.Add(peerHandler);
 
-            await SetupPeerHandler(peerHandler);
+            return SetupPeerHandler(peerHandler);
         }
 
         private async Task SetupPeerHandler(PeerHandler peerHandler)
@@ -136,20 +169,14 @@ namespace DSmoove.Core.Managers
 
         private void BitFieldReceived(BitFieldCommand bitField)
         {
-            //Peer peer = _torrent.Peers.Single(p => p.Id == peerId);
-            //  peer.BitField = bitField.Downloaded;
+
         }
 
         private void HaveReceived(HaveCommand have)
         {
-            //  Peer peer = _torrent.Peers.Single(p => p.Id == peerId);
-            // peer.SetDownloaded(have.PieceIndex);
-
             var piece = _torrent.Pieces.ByIndex(have.PieceIndex);
 
             piece.Availability++;
-
-            //log.DebugFormat("Peer {0} has downloaded {1:P2}", peerId, peer.GetPercentageDownloaded());
         }
 
         private void NotInterestedReceived()

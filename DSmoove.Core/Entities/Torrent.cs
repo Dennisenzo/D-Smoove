@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,18 @@ namespace DSmoove.Core.Entities
             //Pieces = new List<Piece>();
             Files = new List<TorrentFile>();
         }
-        
+
+
+        public Peer AddAndGetPeer(IPAddress address, int port)
+        {
+            Peer peer = Peers.SingleOrDefault(p => p.Equals(address, port));
+            if (peer == null)
+            {
+                peer = new Peer(address, port, Pieces.Count);
+                Peers.Add(peer);
+            }
+            return peer;
+        }
 
 
         public void UpdateAvailability()

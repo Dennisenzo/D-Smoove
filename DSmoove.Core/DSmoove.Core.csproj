@@ -59,7 +59,7 @@
   <ItemGroup>
     <Compile Include="Config\IocModule.cs" />
     <Compile Include="Connections\FileConnection.cs" />
-    <Compile Include="Connections\IncomingConnection.cs" />
+    <Compile Include="Connections\IncomingPeerConnection.cs" />
     <Compile Include="Entities\AvailablePiece.cs" />
     <Compile Include="Entities\Block.cs" />
     <Compile Include="Entities\DataRange.cs" />
@@ -70,13 +70,19 @@
     <Compile Include="Entities\Peer.cs" />
     <Compile Include="Entities\Piece.cs" />
     <Compile Include="Entities\Torrent.cs" />
+    <Compile Include="Enums\DownloadState.cs" />
+    <Compile Include="Enums\UploadState.cs" />
     <Compile Include="Extensions\NetworkStreamExtensions.cs" />
     <Compile Include="Handlers\PeerHandler.cs" />
     <Compile Include="Interfaces\IHandlePeer.cs" />
+    <Compile Include="Interfaces\IHandlePeerConnection.cs" />
     <Compile Include="Interfaces\IHandlePeerMessages.cs" />
+    <Compile Include="Managers\BaseDataManager.cs" />
+    <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\FileManager.cs" />
     <Compile Include="Managers\MetadataManager.cs" />
     <Compile Include="Managers\PieceManager.cs" />
+    <Compile Include="Managers\UploadManager.cs" />
     <Compile Include="Providers\IProvideTorrent.cs" />
     <Compile Include="Helpers\MetadataDecoder.cs" />
     <Compile Include="PeerCommands\BitFieldCommand.cs" />

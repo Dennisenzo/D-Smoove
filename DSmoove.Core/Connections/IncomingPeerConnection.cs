@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Connections
 {
-    public class IncomingConnection
+    public class IncomingPeerConnection
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -23,7 +23,7 @@ namespace DSmoove.Core.Connections
 
         private CancellationToken _cancellationToken;
 
-        public IncomingConnection()
+        public IncomingPeerConnection()
         {
             _listenerTask = new Task(() => StartListeningAsync());
             _cancellationToken = new CancellationToken();

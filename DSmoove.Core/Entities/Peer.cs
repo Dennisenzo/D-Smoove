@@ -17,20 +17,15 @@ namespace DSmoove.Core.Entities
         public Guid Id { get; private set; }
 
         public BitArray BitField { get; set; }
-
-        public PeerConnection Connection { get; set; }
-        
-        private Torrent _torrent;
-
+      
         public PeerStatus Status { get; set; }
 
-        public Peer(IPAddress ipAddress, int port, Torrent torrent)
+        public Peer(IPAddress ipAddress, int port, int pieces)
         {
             IpAddress = ipAddress;
             Port = port;
             Id = Guid.NewGuid();
-            _torrent = torrent;
-            BitField = new BitArray(_torrent.Pieces.Count, false);
+            BitField = new BitArray(pieces, false);
         }
 
         public void SetDownloaded(int index)
@@ -74,6 +69,11 @@ namespace DSmoove.Core.Entities
             return interestedPieces;
         }
 
+        public bool Equals(Peer other)
+        {
+            return Id.Equals(other.Id);
+        }
+
         public bool Equals(IPAddress address, int port)
         {
             return address.Equals(IpAddress) && port.Equals(Port);
@@ -84,6 +84,7 @@ namespace DSmoove.Core.Entities
     {
         Disconnected,
         Connecting,
-        Connected
+        Connected,
+        Failed
     }
 }
