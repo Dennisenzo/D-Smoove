@@ -14,9 +14,16 @@ namespace DSmoove.Core.Managers
 
         private TransferManager()
         {
-            _upload = new UploadManager();
-            _download = new DownloadManager();
             _connection = new ConnectionManager();
+            _upload = new UploadManager(_connection);
+            _download = new DownloadManager(_connection);
+        }
+
+        public void Start()
+        {
+            _connection.Start();
+            _download.Start();
+            _upload.Start();
         }
     }
 }

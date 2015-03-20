@@ -15,103 +15,27 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Handlers
 {
-    public class PeerHandler : IHandlePeer, IHandlePeerMessages
+    public class PeerHandler : IHandlePeerMessages, IHandlePeerConnection, IHandlePeerUploads, IHandlePeerDownloads
     {
+        #region Properties and Fields
+
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private PeerConnection _connection;
 
-        public Peer Peer { get; private set; }
-        private byte[] _torrentHash;
-        private bool _incoming;
 
-        public PeerHandler(Peer peer, TcpClient tcpClient, byte[] torrentHash)
-        {
-            Peer = peer;
-            _torrentHash = torrentHash;
-            _connection = new PeerConnection(tcpClient, this);
-            _incoming = true;
-        }
+        #endregion
 
-        public PeerHandler(Peer peer, byte[] torrentHash)
-        {
-            Peer = peer;
-            _torrentHash = torrentHash;
-            _connection = new PeerConnection(Peer.IpAddress, Peer.Port, this);
-            _incoming = false;
+        #region Constructors
 
-            _connection.PeerConnectedEvent += PeerIsConnected;
-            _connection.PeerDisconnectedEvent += PeerIsDisconnected;
-        }
+        #endregion
 
-        private void PeerIsDisconnected()
-        {
-            Peer.Status = PeerStatus.Failed;
-        }
+        #region IHandlePeerMessages
 
-        private void PeerIsConnected()
-        {
-            Peer.Status = PeerStatus.Connected;
-
-            Task handShakeTask = SendHandshake();
-            Task bitFieldTask = SendBitfield();
-
-           // task.Wait();
-        }
-
-        private async Task SendBitfield()
-        {
-            log.DebugFormat("Sending Handshake to {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
-        }
-
-        private async Task SendHandshake()
-        {
-            log.DebugFormat("Sending Handshake to {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
-            HandshakeCommand handshake = new HandshakeCommand()
-                {
-                    InfoHash = _torrentHash
-                };
-            await _connection.SendAsync(handshake.ToByteArray());
-        }
-
-        public async Task Start()
-        {
-            Peer.Status = PeerStatus.Connecting;
-            await _connection.Connect();
-        }
-
-        #region IHandlePeer
-
-        public bool AmChoking { get; private set; }
-        public bool AmInterested { get; private set; }
-        public bool IsChoking { get; private set; }
-        public bool IsInterested { get; private set; }
-
-        public void Connect()
+        public void HandlePeerMessage(byte[] messageData)
         {
             throw new NotImplementedException();
         }
 
-        public void Disconnect()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Choke()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Unchoke()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Interested()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void NotInterested()
+        public void HandleHandshakeMessage(byte[] handshakeData)
         {
             throw new NotImplementedException();
         }
@@ -120,218 +44,442 @@ namespace DSmoove.Core.Handlers
 
         #region IHandlePeerMessages
 
-        public void HandleHandshakeMessage(byte[] messageData)
+        public void SendHandshakeCommand(HandshakeCommand command)
         {
-            HandshakeCommand handShake = new HandshakeCommand();
-            handShake.FromByteArray(messageData);
-
-            log.DebugFormat("Received Handshake message from {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
-
-            if (HandShakeReceivedEvent != null)
-            {
-                HandShakeReceivedEvent(handShake);
-            }
-            if (_incoming)
-            {
-                SendHandshake();
-            }
+            throw new NotImplementedException();
         }
 
-        public void HandlePeerMessage(byte[] messageData)
+        public void SendPortCommand(PortCommand command)
         {
-            if (messageData == null)
-            {
-                if (KeepAliveReceivedEvent != null)
-                {
-                    log.DebugFormat("Received KeepAlive message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-                    KeepAliveReceivedEvent();
-                }
-            }
-            else
-            {
-                switch ((PeerCommandId)messageData[0])
-                {
-                    case PeerCommandId.Choke:
-                        {
-                            if (ChokeReceivedEvent != null)
-                            {
-                                IsChoking = true;
-                                log.DebugFormat("Received Choke message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-                                ChokeReceivedEvent();
-                            }
-                            break;
-                        }
-                    case PeerCommandId.Unchoke:
-                        {
-                            if (UnchokeReceivedEvent != null)
-                            {
-                                IsChoking = false;
-                                log.DebugFormat("Received Unchoke message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-                                UnchokeReceivedEvent();
-                            }
-                            break;
-                        }
-                    case PeerCommandId.Interested:
-                        {
-                            if (InterestedReceivedEvent != null)
-                            {
-                                IsInterested = true;
-                                log.DebugFormat("Received Interested message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-                                InterestedReceivedEvent();
-                            }
-                            break;
-                        }
-                    case PeerCommandId.NotInterested:
-                        {
-                            if (NotInterestedReceivedEvent != null)
-                            {
-                                IsInterested = false;
-                                log.DebugFormat("Received NotInterested message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-                                NotInterestedReceivedEvent();
-                            }
-                            break;
-                        }
-                    case PeerCommandId.BitField:
-                        {
-                            if (BitFieldReceivedEvent != null)
-                            {
-                                log.DebugFormat("Received BitField message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+            throw new NotImplementedException();
+        }
 
-                                BitFieldCommand bitField = new BitFieldCommand();
+        public void SendChokeCommand(ChokeCommand command)
+        {
+            throw new NotImplementedException();
+        }
 
-                                bitField.FromByteArray(messageData);
+        public void SendUnchokeCommand(UnchokeCommand command)
+        {
+            throw new NotImplementedException();
+        }
 
-                                Peer.BitField = bitField.Downloaded;
+        public void SendInterestedCommand(InterestedCommand command)
+        {
+            throw new NotImplementedException();
+        }
 
-                                log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+        public void SendNotInterestedCommand(NotInterestedCommand command)
+        {
+            throw new NotImplementedException();
+        }
 
-                                BitFieldReceivedEvent(bitField);
-                            }
-                            break;
-                        }
-                    case PeerCommandId.Have:
-                        {
-                            if (HaveReceivedEvent != null)
-                            {
-                                log.DebugFormat("Received Have message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+        public void SubscribeToHandshakeCommand(Action<IHandlePeerConnection, HandshakeCommand> action)
+        {
+            throw new NotImplementedException();
+        }
 
-                                HaveCommand have = new HaveCommand();
+        public void SubscribeToPortCommand(Action<IHandlePeerConnection, PortCommand> action)
+        {
+            throw new NotImplementedException();
+        }
 
-                                have.FromByteArray(messageData);
+        public void SubscribeToChokeCommand(Action<IHandlePeerConnection, ChokeCommand> action)
+        {
+            throw new NotImplementedException();
+        }
 
-                                Peer.SetDownloaded(have.PieceIndex);
+        public void SubscribeToUnchokeCommand(Action<IHandlePeerConnection, UnchokeCommand> action)
+        {
+            throw new NotImplementedException();
+        }
 
-                                log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+        public void SubscribeToInterestedCommand(Action<IHandlePeerConnection, InterestedCommand> action)
+        {
+            throw new NotImplementedException();
+        }
 
-                                HaveReceivedEvent(have);
-                            }
-                            break;
-                        }
-
-                    case PeerCommandId.Request:
-                        {
-                            if (RequestReceivedEvent != null)
-                            {
-                                log.DebugFormat("Received Request message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-
-                                RequestCommand request = new RequestCommand();
-
-                                request.FromByteArray(messageData);
-
-                                RequestReceivedEvent(request);
-                            }
-                            break;
-                        }
-
-                    default:
-                        {
-                            log.Warn("Weird data received!");
-                            break;
-                        }
-                }
-            }
+        public void SubscribeToNotInterestedCommand(Action<IHandlePeerConnection, NotInterestedCommand> action)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
 
-        public async Task SetInterested(bool interested)
-        {
-            if (interested != AmInterested)
-            {
-                AmInterested = interested;
+        #region IHandlePeerMessages
 
-                await SendInterestedAsync();
-            }
+        public void SendBitfieldCommand(BitFieldCommand command)
+        {
+            throw new NotImplementedException();
         }
 
-        public async Task SetChoke(bool choke)
+        public void SendHaveCommand(HaveCommand command)
         {
-            if (choke != AmChoking)
-            {
-                AmChoking = choke;
-                await SendChokeAsync();
-            }
+            throw new NotImplementedException();
         }
 
-        #region Private Send Commands
-
-        private async Task SendInterestedAsync()
+        public void SendPieceCommand(PieceCommand command)
         {
-            if (AmInterested)
-            {
-                log.DebugFormat("Sending Interested to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-
-                InterestedCommand command = new InterestedCommand();
-
-                await _connection.SendAsync(command.ToByteArray());
-            }
-            else
-            {
-                log.DebugFormat("Sending Not Interested to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-
-                NotInterestedCommand command = new NotInterestedCommand();
-
-                await _connection.SendAsync(command.ToByteArray());
-            }
+            throw new NotImplementedException();
         }
-        private async Task SendChokeAsync()
+
+        public void SubscribeToRequestCommand(Action<IHandlePeerUploads, RequestCommand> action)
         {
-            if (AmChoking)
-            {
-                log.DebugFormat("Sending Unchoke to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+            throw new NotImplementedException();
+        }
 
-                UnchokeCommand command = new UnchokeCommand();
-
-                await _connection.SendAsync(command.ToByteArray());
-            }
-            else
-            {
-                log.DebugFormat("Sending Choke to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
-
-                ChokeCommand command = new ChokeCommand();
-
-                await _connection.SendAsync(command.ToByteArray());
-            }
+        public void SubscribeToCancelCommand(Action<IHandlePeerUploads, CancelCommand> action)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
 
-        #region Events
+        #region IHandlePeerMessages
 
-        public event PeerConnected PeerConnectedEvent;
-        public event PeerDisconnected PeerDisconnectedEvent;
+        public void SendRequestCommand(RequestCommand command)
+        {
+            throw new NotImplementedException();
+        }
 
-        public event KeepAliveReceived KeepAliveReceivedEvent;
-        public event ChokeReceived ChokeReceivedEvent;
-        public event UnchokeReceived UnchokeReceivedEvent;
-        public event InterestedReceived InterestedReceivedEvent;
-        public event NotInterestedReceived NotInterestedReceivedEvent;
+        public void SendCancelCommand(CancelCommand command)
+        {
+            throw new NotImplementedException();
+        }
 
-        public event HandShakeReceived HandShakeReceivedEvent;
-        public event BitFieldReceived BitFieldReceivedEvent;
-        public event HaveReceived HaveReceivedEvent;
-        public event RequestReceived RequestReceivedEvent;
+        public void SubscribeToBitFieldCommand(Action<IHandlePeerDownloads, BitFieldCommand> action)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SubscribeToHaveCommand(Action<IHandlePeerDownloads, HaveCommand> action)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SubscribeToPieceCommand(Action<IHandlePeerDownloads, PieceCommand> action)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }
 }
+
+//        private PeerConnection _connection;
+
+//        public Peer Peer { get; private set; }
+//        private byte[] _torrentHash;
+//        private bool _incoming;
+
+//        public PeerHandler(Peer peer, TcpClient tcpClient, byte[] torrentHash)
+//        {
+//            Peer = peer;
+//            _torrentHash = torrentHash;
+//            _connection = new PeerConnection(tcpClient, this);
+//            _incoming = true;
+//        }
+
+//        public PeerHandler(Peer peer, byte[] torrentHash)
+//        {
+//            Peer = peer;
+//            _torrentHash = torrentHash;
+//            _connection = new PeerConnection(Peer.IpAddress, Peer.Port, this);
+//            _incoming = false;
+
+//            _connection.PeerConnectedEvent += PeerIsConnected;
+//            _connection.PeerDisconnectedEvent += PeerIsDisconnected;
+//        }
+
+//        private void PeerIsDisconnected()
+//        {
+//            Peer.Status = PeerStatus.Failed;
+//        }
+
+//        private void PeerIsConnected()
+//        {
+//            Peer.Status = PeerStatus.Connected;
+
+//            Task handShakeTask = SendHandshake();
+//            Task bitFieldTask = SendBitfield();
+
+//           // task.Wait();
+//        }
+
+//        private async Task SendBitfield()
+//        {
+//            log.DebugFormat("Sending Handshake to {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
+//        }
+
+//        private async Task SendHandshake()
+//        {
+//            log.DebugFormat("Sending Handshake to {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
+//            HandshakeCommand handshake = new HandshakeCommand()
+//                {
+//                    InfoHash = _torrentHash
+//                };
+//            await _connection.SendAsync(handshake.ToByteArray());
+//        }
+
+//        public async Task Start()
+//        {
+//            Peer.Status = PeerStatus.Connecting;
+//            await _connection.Connect();
+//        }
+
+//        #region IHandlePeer
+
+//        public bool AmChoking { get; private set; }
+//        public bool AmInterested { get; private set; }
+//        public bool IsChoking { get; private set; }
+//        public bool IsInterested { get; private set; }
+
+//        public void Connect()
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//        public void Disconnect()
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//        public void Choke()
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//        public void Unchoke()
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//        public void Interested()
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//        public void NotInterested()
+//        {
+//            throw new NotImplementedException();
+//        }
+
+//        #endregion
+
+//        #region IHandlePeerMessages
+
+//        public void HandleHandshakeMessage(byte[] messageData)
+//        {
+//            HandshakeCommand handShake = new HandshakeCommand();
+//            handShake.FromByteArray(messageData);
+
+//            log.DebugFormat("Received Handshake message from {0}:{1}.", Peer.IpAddress.ToString(), Peer.Port);
+
+//            if (HandShakeReceivedEvent != null)
+//            {
+//                HandShakeReceivedEvent(handShake);
+//            }
+//            if (_incoming)
+//            {
+//                SendHandshake();
+//            }
+//        }
+
+//        public void HandlePeerMessage(byte[] messageData)
+//        {
+//            if (messageData == null)
+//            {
+//                if (KeepAliveReceivedEvent != null)
+//                {
+//                    log.DebugFormat("Received KeepAlive message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+//                    KeepAliveReceivedEvent();
+//                }
+//            }
+//            else
+//            {
+//                switch ((PeerCommandId)messageData[0])
+//                {
+//                    case PeerCommandId.Choke:
+//                        {
+//                            if (ChokeReceivedEvent != null)
+//                            {
+//                                IsChoking = true;
+//                                log.DebugFormat("Received Choke message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+//                                ChokeReceivedEvent();
+//                            }
+//                            break;
+//                        }
+//                    case PeerCommandId.Unchoke:
+//                        {
+//                            if (UnchokeReceivedEvent != null)
+//                            {
+//                                IsChoking = false;
+//                                log.DebugFormat("Received Unchoke message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+//                                UnchokeReceivedEvent();
+//                            }
+//                            break;
+//                        }
+//                    case PeerCommandId.Interested:
+//                        {
+//                            if (InterestedReceivedEvent != null)
+//                            {
+//                                IsInterested = true;
+//                                log.DebugFormat("Received Interested message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+//                                InterestedReceivedEvent();
+//                            }
+//                            break;
+//                        }
+//                    case PeerCommandId.NotInterested:
+//                        {
+//                            if (NotInterestedReceivedEvent != null)
+//                            {
+//                                IsInterested = false;
+//                                log.DebugFormat("Received NotInterested message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+//                                NotInterestedReceivedEvent();
+//                            }
+//                            break;
+//                        }
+//                    case PeerCommandId.BitField:
+//                        {
+//                            if (BitFieldReceivedEvent != null)
+//                            {
+//                                log.DebugFormat("Received BitField message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                                BitFieldCommand bitField = new BitFieldCommand();
+
+//                                bitField.FromByteArray(messageData);
+
+//                                Peer.BitField = bitField.Downloaded;
+
+//                                log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+
+//                                BitFieldReceivedEvent(bitField);
+//                            }
+//                            break;
+//                        }
+//                    case PeerCommandId.Have:
+//                        {
+//                            if (HaveReceivedEvent != null)
+//                            {
+//                                log.DebugFormat("Received Have message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                                HaveCommand have = new HaveCommand();
+
+//                                have.FromByteArray(messageData);
+
+//                                Peer.SetDownloaded(have.PieceIndex);
+
+//                                log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+
+//                                HaveReceivedEvent(have);
+//                            }
+//                            break;
+//                        }
+
+//                    case PeerCommandId.Request:
+//                        {
+//                            if (RequestReceivedEvent != null)
+//                            {
+//                                log.DebugFormat("Received Request message from {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                                RequestCommand request = new RequestCommand();
+
+//                                request.FromByteArray(messageData);
+
+//                                RequestReceivedEvent(request);
+//                            }
+//                            break;
+//                        }
+
+//                    default:
+//                        {
+//                            log.Warn("Weird data received!");
+//                            break;
+//                        }
+//                }
+//            }
+//        }
+
+//        #endregion
+
+//        public async Task SetInterested(bool interested)
+//        {
+//            if (interested != AmInterested)
+//            {
+//                AmInterested = interested;
+
+//                await SendInterestedAsync();
+//            }
+//        }
+
+//        public async Task SetChoke(bool choke)
+//        {
+//            if (choke != AmChoking)
+//            {
+//                AmChoking = choke;
+//                await SendChokeAsync();
+//            }
+//        }
+
+//        #region Private Send Commands
+
+//        private async Task SendInterestedAsync()
+//        {
+//            if (AmInterested)
+//            {
+//                log.DebugFormat("Sending Interested to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                InterestedCommand command = new InterestedCommand();
+
+//                await _connection.SendAsync(command.ToByteArray());
+//            }
+//            else
+//            {
+//                log.DebugFormat("Sending Not Interested to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                NotInterestedCommand command = new NotInterestedCommand();
+
+//                await _connection.SendAsync(command.ToByteArray());
+//            }
+//        }
+//        private async Task SendChokeAsync()
+//        {
+//            if (AmChoking)
+//            {
+//                log.DebugFormat("Sending Unchoke to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                UnchokeCommand command = new UnchokeCommand();
+
+//                await _connection.SendAsync(command.ToByteArray());
+//            }
+//            else
+//            {
+//                log.DebugFormat("Sending Choke to {0}:{1}.", _connection.Address.ToString(), _connection.Port);
+
+//                ChokeCommand command = new ChokeCommand();
+
+//                await _connection.SendAsync(command.ToByteArray());
+//            }
+//        }
+
+//        #endregion
+
+//        #region Events
+
+//        public event PeerConnected PeerConnectedEvent;
+//        public event PeerDisconnected PeerDisconnectedEvent;
+
+//        public event KeepAliveReceived KeepAliveReceivedEvent;
+//        public event ChokeReceived ChokeReceivedEvent;
+//        public event UnchokeReceived UnchokeReceivedEvent;
+//        public event InterestedReceived InterestedReceivedEvent;
+//        public event NotInterestedReceived NotInterestedReceivedEvent;
+
+//        public event HandShakeReceived HandShakeReceivedEvent;
+//        public event BitFieldReceived BitFieldReceivedEvent;
+//        public event HaveReceived HaveReceivedEvent;
+//        public event RequestReceived RequestReceivedEvent;
+
+//        #endregion
+//    }
+//}

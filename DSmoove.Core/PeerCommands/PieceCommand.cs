@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.PeerCommands
 {
-    class PieceCommand
+    public class PieceCommand
     {
     }
 }

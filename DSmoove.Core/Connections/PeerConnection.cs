@@ -11,7 +11,7 @@ using DSmoove.Core.Extensions;
 
 namespace DSmoove.Core.Connections
 {
-    public class PeerConnection : IHandlePeerConnection
+    public class PeerConnection 
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private TcpClient _tcpClient;
@@ -24,9 +24,9 @@ namespace DSmoove.Core.Connections
 
         private Task _readTask;
 
-        public event PeerConnected PeerConnectedEvent;
+     //   public event PeerConnected PeerConnectedEvent;
 
-        public event PeerDisconnected PeerDisconnectedEvent;
+      //  public event PeerDisconnected PeerDisconnectedEvent;
 
         public PeerConnection(IPAddress ipAddress, int port, IHandlePeerMessages messageHandler)
         {
@@ -59,10 +59,10 @@ namespace DSmoove.Core.Connections
                     _readTask = ReadAsync();
                 }
 
-                if (PeerConnectedEvent != null)
-                {
-                    PeerConnectedEvent();
-                }
+                //if (PeerConnectedEvent != null)
+                //{
+                //    PeerConnectedEvent();
+                //}
 
                 log.DebugFormat("Connected to peer {0}:{1}, starting read.", Address, Port);
             }
@@ -70,10 +70,10 @@ namespace DSmoove.Core.Connections
             {
                 log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
 
-                if (PeerDisconnectedEvent != null)
-                {
-                    PeerDisconnectedEvent();
-                }
+                //if (PeerDisconnectedEvent != null)
+                //{
+                //    PeerDisconnectedEvent();
+                //}
                 return false;
             }
 
@@ -94,10 +94,10 @@ namespace DSmoove.Core.Connections
                 {
                     log.WarnFormat("Could not send data to {0}:{1} ({2})", Address, Port, e.Message);
 
-                    if (PeerDisconnectedEvent != null)
-                    {
-                        PeerDisconnectedEvent();
-                    }
+                    //if (PeerDisconnectedEvent != null)
+                    //{
+                    //    PeerDisconnectedEvent();
+                    //}
                 }
             }
         }
@@ -152,10 +152,10 @@ namespace DSmoove.Core.Connections
             {
                 log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
 
-                if (PeerDisconnectedEvent != null)
-                {
-                    PeerDisconnectedEvent();
-                }
+                //if (PeerDisconnectedEvent != null)
+                //{
+                //    PeerDisconnectedEvent();
+                //}
             }
         }
 

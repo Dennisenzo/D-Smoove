@@ -26,7 +26,7 @@ namespace DSmoove.Core.Managers
 
         private IProvideTorrent _torrentProvider;
 
-        private OldTransferManager _peerManager;
+       // private OldTransferManager _peerManager;
         private FileManager _fileManager;
         private TrackerManager _trackerManager;
         private PieceManager _pieceManager;
@@ -38,7 +38,7 @@ namespace DSmoove.Core.Managers
             _torrentProvider = torrentProvider;
             Torrent = new Torrent();
             _fileManager = new FileManager(Torrent);
-            _peerManager = new OldTransferManager(Torrent, _fileManager);
+          //  _peerManager = new OldTransferManager(Torrent, _fileManager);
             _trackerManager = new TrackerManager(Torrent);
             _pieceManager = new PieceManager(Torrent);
             LastState = TorrentState.DownloadingMetadata;
@@ -79,7 +79,7 @@ namespace DSmoove.Core.Managers
         private void Download()
         {
             log.Info("Starting torrent download.");
-            _peerManager.Start();
+            //_peerManager.Start();
         }
 
         private void ConnectToTracker()

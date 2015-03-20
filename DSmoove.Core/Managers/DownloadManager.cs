@@ -1,4 +1,5 @@
 ﻿using DSmoove.Core.Enums;
+using DSmoove.Core.Interfaces;
 using Stateless;
 using System;
 using System.Collections.Generic;
@@ -8,18 +9,24 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Managers
 {
-   public class DownloadManager : BaseDataManager
+    public class DownloadManager : BaseDataManager
     {
-     private  StateMachine<DownloadState, DownloadTrigger> _stateMachine;
+        private StateMachine<DownloadState, DownloadTrigger> _stateMachine;
+        private IHandlePeerConnections _connectionHandler;
 
-       public void Start()
-     {
-         _stateMachine.Fire(DownloadTrigger.Start);
-     }
+        public DownloadManager(IHandlePeerConnections connectionHandler)
+        {
+            _connectionHandler = connectionHandler;
+        }
 
-       public void Stop()
-       {
-           _stateMachine.Fire(DownloadTrigger.Start);
-       }
+        public void Start()
+        {
+            _stateMachine.Fire(DownloadTrigger.Start);
+        }
+
+        public void Stop()
+        {
+            _stateMachine.Fire(DownloadTrigger.Start);
+        }
     }
 }

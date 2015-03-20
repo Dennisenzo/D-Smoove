@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSmoove.Core.PeerCommands
+namespace DSmoove.Core.Interfaces
 {
-    public class CancelCommand
+   public interface IHandlePeerConnections
     {
     }
 }
