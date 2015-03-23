@@ -1,4 +1,5 @@
-﻿using DSmoove.Core.PeerCommands;
+﻿using DSmoove.Core.Helpers;
+using DSmoove.Core.PeerCommands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,11 @@ namespace DSmoove.Core.Interfaces
         void SendInterestedCommand(InterestedCommand command);
         void SendNotInterestedCommand(NotInterestedCommand command);
 
-        void SubscribeToHandshakeCommand(Action<IHandlePeerConnection, HandshakeCommand> action);
-        void SubscribeToPortCommand(Action<IHandlePeerConnection, PortCommand> action);
-        void SubscribeToChokeCommand(Action<IHandlePeerConnection, ChokeCommand> action);
-        void SubscribeToUnchokeCommand(Action<IHandlePeerConnection, UnchokeCommand> action);
-        void SubscribeToInterestedCommand(Action<IHandlePeerConnection, InterestedCommand> action);
-        void SubscribeToNotInterestedCommand(Action<IHandlePeerConnection, NotInterestedCommand> action);
+        AsyncSubscription<IHandlePeerConnection, HandshakeCommand> HandshakeCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerConnection, PortCommand> PortCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerConnection, ChokeCommand> ChokeCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerConnection, UnchokeCommand> UnchokeCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerConnection, InterestedCommand> InterestedCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerConnection, NotInterestedCommand> NotInterestedCommandSubscription { get; }
     }
 }

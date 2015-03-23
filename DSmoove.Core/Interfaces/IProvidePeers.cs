@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Interfaces
 {
-   public interface IHandlePeerConnections
+    public interface IProvidePeers
     {
     }
 }

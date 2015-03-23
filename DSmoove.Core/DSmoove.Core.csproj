@@ -76,10 +76,10 @@
     <Compile Include="Extensions\NetworkStreamExtensions.cs" />
     <Compile Include="Handlers\PeerHandler.cs" />
     <Compile Include="Helpers\AsyncSubscription.cs" />
+    <Compile Include="Interfaces\IProvidePeers.cs" />
     <Compile Include="Interfaces\IHandlePeerConnection.cs" />
-    <Compile Include="Interfaces\IHandlePeerConnections.cs" />
     <Compile Include="Interfaces\IHandlePeerDownloads.cs" />
-    <Compile Include="Interfaces\IHandlePeerMessages.cs" />
+    <Compile Include="Interfaces\IProvidePeerMessages.cs" />
     <Compile Include="Interfaces\IHandlePeerUploads.cs" />
     <Compile Include="Interfaces\IProvideTrackerUpdates.cs" />
     <Compile Include="Managers\BaseDataManager.cs" />

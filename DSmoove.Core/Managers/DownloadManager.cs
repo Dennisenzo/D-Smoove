@@ -12,11 +12,11 @@ namespace DSmoove.Core.Managers
     public class DownloadManager : BaseDataManager
     {
         private StateMachine<DownloadState, DownloadTrigger> _stateMachine;
-        private IHandlePeerConnections _connectionHandler;
+        private IProvidePeers _peerProvider;
 
-        public DownloadManager(IHandlePeerConnections connectionHandler)
+        public DownloadManager(IProvidePeers peerProvider)
         {
-            _connectionHandler = connectionHandler;
+            _peerProvider = peerProvider;
         }
 
         public void Start()

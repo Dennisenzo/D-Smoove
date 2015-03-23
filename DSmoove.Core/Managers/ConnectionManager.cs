@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Managers
 {
-    public class ConnectionManager : IHandlePeerConnections
+    public class ConnectionManager : IProvidePeers
     {
         private List<PeerHandler> _peerHandlers;
 
@@ -35,7 +35,10 @@ namespace DSmoove.Core.Managers
 
         public void AddPeer(IPAddress address, int port, string peerId = null)
         {
-
+            if (!_peerHandlers.Any(p => p.IPAddress == address && p.Port == port))
+            {
+                PeerHandler peerHandler = new PeerHandler(address, port, peerId);
+            }
         }
     }
 }

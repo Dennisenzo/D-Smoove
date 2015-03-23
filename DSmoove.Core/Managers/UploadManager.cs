@@ -9,11 +9,11 @@ namespace DSmoove.Core.Managers
 {
     public class UploadManager : BaseDataManager
     {
-        private IHandlePeerConnections _connectionHandler;
+        private IProvidePeers _peerProvider;
 
-        public UploadManager(IHandlePeerConnections connectionHandler)
+        public UploadManager(IProvidePeers peerProvider)
         {
-            _connectionHandler = connectionHandler;
+            _peerProvider = peerProvider;
         }
 
         internal void Start()

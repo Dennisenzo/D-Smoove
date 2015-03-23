@@ -8,10 +8,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Linq;
 using DSmoove.Core.Extensions;
+using DSmoove.Core.Helpers;
 
 namespace DSmoove.Core.Connections
 {
-    public class PeerConnection 
+    public class PeerConnection :IProvidePeerMessages
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private TcpClient _tcpClient;
@@ -20,31 +21,32 @@ namespace DSmoove.Core.Connections
         public IPAddress Address { get; private set; }
         public int Port { get; private set; }
 
-        private IHandlePeerMessages _messageHandler;
+        public AsyncSubscription<IProvidePeerMessages, byte[]> PeerMessageSubscription { get; private set; }
+        public AsyncSubscription<IProvidePeerMessages, byte[]> PeerHandshakeSubscription { get;private set; }
 
         private Task _readTask;
 
-     //   public event PeerConnected PeerConnectedEvent;
-
-      //  public event PeerDisconnected PeerDisconnectedEvent;
-
-        public PeerConnection(IPAddress ipAddress, int port, IHandlePeerMessages messageHandler)
+        public PeerConnection()
+        {
+            PeerMessageSubscription = new AsyncSubscription<IProvidePeerMessages, byte[]>();
+            PeerHandshakeSubscription = new AsyncSubscription<IProvidePeerMessages, byte[]>();
+        }
+        public PeerConnection(IPAddress ipAddress, int port)
+            : this()
         {
             Address = ipAddress;
             Port = port;
             _incoming = false;
-            _messageHandler = messageHandler;
         }
 
-        public PeerConnection(TcpClient tcpClient, IHandlePeerMessages messageHandler)
+        public PeerConnection(TcpClient tcpClient)
+            : this()
         {
             _tcpClient = tcpClient;
 
             Address = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address;
             Port = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port;
             _incoming = true;
-
-            _messageHandler = messageHandler;
         }
 
         public async Task<bool> Connect()
@@ -59,21 +61,11 @@ namespace DSmoove.Core.Connections
                     _readTask = ReadAsync();
                 }
 
-                //if (PeerConnectedEvent != null)
-                //{
-                //    PeerConnectedEvent();
-                //}
-
                 log.DebugFormat("Connected to peer {0}:{1}, starting read.", Address, Port);
             }
             catch (Exception e)
             {
                 log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
-
-                //if (PeerDisconnectedEvent != null)
-                //{
-                //    PeerDisconnectedEvent();
-                //}
                 return false;
             }
 
@@ -93,11 +85,6 @@ namespace DSmoove.Core.Connections
                 catch (Exception e)
                 {
                     log.WarnFormat("Could not send data to {0}:{1} ({2})", Address, Port, e.Message);
-
-                    //if (PeerDisconnectedEvent != null)
-                    //{
-                    //    PeerDisconnectedEvent();
-                    //}
                 }
             }
         }
@@ -120,7 +107,7 @@ namespace DSmoove.Core.Connections
 
                 ms.Write(messageBuffer, 0, bytesRead);
 
-                _messageHandler.HandleHandshakeMessage(ms.ToArray());
+                await PeerHandshakeSubscription.TriggerAsync(this, ms.ToArray());
 
                 ms.Seek(0, SeekOrigin.Begin);
 
@@ -134,7 +121,8 @@ namespace DSmoove.Core.Connections
 
                     if (messageLength == 0)
                     {
-                        _messageHandler.HandlePeerMessage(new byte[0]);
+                        await PeerMessageSubscription.TriggerAsync(this, new byte[0]);
+      
                     }
                     else
                     {
@@ -143,7 +131,7 @@ namespace DSmoove.Core.Connections
                         bytesRead = await ns.ReadFullBufferAsync(messageBuffer);
 
                         ms.Write(messageBuffer, 0, bytesRead);
-                        _messageHandler.HandlePeerMessage(ms.ToArray());
+                        await PeerMessageSubscription.TriggerAsync(this, ms.ToArray());
                         ms.Seek(0, SeekOrigin.Begin);
                     }
                 }
@@ -151,11 +139,6 @@ namespace DSmoove.Core.Connections
             catch (IOException e)
             {
                 log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
-
-                //if (PeerDisconnectedEvent != null)
-                //{
-                //    PeerDisconnectedEvent();
-                //}
             }
         }
 

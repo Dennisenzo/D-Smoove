@@ -83,7 +83,7 @@ namespace DSmoove.Core.Managers
 
                     ushort port = (ushort)BitConverter.ToInt16(portBytes, 0);
 
-                    trackerData.Peers.Add(new TrackerData.Peer()
+                    trackerData.Peers.Add(new TrackerData.PeerData()
                         {
                             IPAddress = ip,
                             Port = port,

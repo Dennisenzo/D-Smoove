@@ -16,21 +16,41 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Handlers
 {
-    public class PeerHandler : IHandlePeerMessages, IHandlePeerConnection, IHandlePeerUploads, IHandlePeerDownloads
+    public class PeerHandler : IHandlePeerConnection, IHandlePeerUploads, IHandlePeerDownloads
     {
         #region Properties and Fields
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        public IPAddress IPAddress { get; private set; }
+        public int Port { get; private set; }
+        public string PeerId { get; private set; }
+
+        private PeerConnection _peerConnection;
 
         #endregion
 
         #region Constructors
 
-        public PeerHandler()
+        public PeerHandler(IPAddress ipAddress, int port, string peerId)
         {
+            _peerConnection = new PeerConnection(ipAddress, port);
+            _peerConnection.PeerHandshakeSubscription.Subscribe(HandleHandshakeMessage);
+            _peerConnection.PeerMessageSubscription.Subscribe(HandlePeerMessage);
+            PeerId = peerId;
+
+            HandshakeCommandSubscription = new AsyncSubscription<IHandlePeerConnection, HandshakeCommand>();
+            PortCommandSubscription = new AsyncSubscription<IHandlePeerConnection, PortCommand>();
+            ChokeCommandSubscription = new AsyncSubscription<IHandlePeerConnection, ChokeCommand>();
+            UnchokeCommandSubscription = new AsyncSubscription<IHandlePeerConnection, UnchokeCommand>();
+            InterestedCommandSubscription = new AsyncSubscription<IHandlePeerConnection, InterestedCommand>();
+            NotInterestedCommandSubscription = new AsyncSubscription<IHandlePeerConnection, NotInterestedCommand>();
+
+            RequestCommandSubscription = new AsyncSubscription<IHandlePeerUploads, RequestCommand>();
+            CancelCommandSubscription = new AsyncSubscription<IHandlePeerUploads, CancelCommand>();
+
             BitFieldCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, BitFieldCommand>();
-            HaveCommandSubscription = new AsyncSubscription<IHandlePeerDownloads,HaveCommand>();
+            HaveCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, HaveCommand>();
             PieceCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, PieceCommand>();
         }
 
@@ -38,19 +58,19 @@ namespace DSmoove.Core.Handlers
 
         #region IHandlePeerMessages
 
-        public void HandlePeerMessage(byte[] messageData)
+        public void HandlePeerMessage(IProvidePeerMessages source, byte[] messageData)
         {
             throw new NotImplementedException();
         }
 
-        public void HandleHandshakeMessage(byte[] handshakeData)
+        public void HandleHandshakeMessage(IProvidePeerMessages source, byte[] handshakeData)
         {
             throw new NotImplementedException();
         }
 
         #endregion
 
-        #region IHandlePeerMessages
+        #region IHandlePeerConnection
 
         public void SendHandshakeCommand(HandshakeCommand command)
         {
@@ -82,39 +102,16 @@ namespace DSmoove.Core.Handlers
             throw new NotImplementedException();
         }
 
-        public void SubscribeToHandshakeCommand(Action<IHandlePeerConnection, HandshakeCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToPortCommand(Action<IHandlePeerConnection, PortCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToChokeCommand(Action<IHandlePeerConnection, ChokeCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToUnchokeCommand(Action<IHandlePeerConnection, UnchokeCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToInterestedCommand(Action<IHandlePeerConnection, InterestedCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToNotInterestedCommand(Action<IHandlePeerConnection, NotInterestedCommand> action)
-        {
-            throw new NotImplementedException();
-        }
+        public AsyncSubscription<IHandlePeerConnection, HandshakeCommand> HandshakeCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerConnection, PortCommand> PortCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerConnection, ChokeCommand> ChokeCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerConnection, UnchokeCommand> UnchokeCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerConnection, InterestedCommand> InterestedCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerConnection, NotInterestedCommand> NotInterestedCommandSubscription { get; private set; }
 
         #endregion
 
-        #region IHandlePeerMessages
+        #region IHandlePeerUploads
 
         public void SendBitfieldCommand(BitFieldCommand command)
         {
@@ -131,19 +128,12 @@ namespace DSmoove.Core.Handlers
             throw new NotImplementedException();
         }
 
-        public void SubscribeToRequestCommand(Action<IHandlePeerUploads, RequestCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToCancelCommand(Action<IHandlePeerUploads, CancelCommand> action)
-        {
-            throw new NotImplementedException();
-        }
+        public AsyncSubscription<IHandlePeerUploads, RequestCommand> RequestCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerUploads, CancelCommand> CancelCommandSubscription { get; private set; }
 
         #endregion
 
-        #region IHandlePeerMessages
+        #region IHandlePeerDownloads
 
         public void SendRequestCommand(RequestCommand command)
         {

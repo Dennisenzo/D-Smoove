@@ -81,7 +81,7 @@ namespace DSmoove.Core.Managers
         private void Download()
         {
             log.Info("Starting torrent download.");
-            //_peerManager.Start();
+            _transferManager.Start();
         }
 
         private void ConnectToTracker()

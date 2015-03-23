@@ -9,16 +9,16 @@ namespace DSmoove.Core.Entities
 {
     public class TrackerData
     {
-        public List<Peer> Peers { get; set; }
+        public List<PeerData> Peers { get; set; }
         public DateTime UpdateTime { get; private set; }
 
         public TrackerData()
         {
-            Peers = new List<Peer>();
+            Peers = new List<PeerData>();
             UpdateTime = DateTime.Now;
         }
 
-        public class Peer
+        public class PeerData
         {
             public IPAddress IPAddress { get; set; }
             public int Port { get; set; }
