@@ -1,5 +1,6 @@
 ﻿using DSmoove.Core.Connections;
 using DSmoove.Core.Entities;
+using DSmoove.Core.Helpers;
 using DSmoove.Core.Interfaces;
 using DSmoove.Core.PeerCommands;
 using log4net;
@@ -25,6 +26,13 @@ namespace DSmoove.Core.Handlers
         #endregion
 
         #region Constructors
+
+        public PeerHandler()
+        {
+            BitFieldCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, BitFieldCommand>();
+            HaveCommandSubscription = new AsyncSubscription<IHandlePeerDownloads,HaveCommand>();
+            PieceCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, PieceCommand>();
+        }
 
         #endregion
 
@@ -147,20 +155,9 @@ namespace DSmoove.Core.Handlers
             throw new NotImplementedException();
         }
 
-        public void SubscribeToBitFieldCommand(Action<IHandlePeerDownloads, BitFieldCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToHaveCommand(Action<IHandlePeerDownloads, HaveCommand> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SubscribeToPieceCommand(Action<IHandlePeerDownloads, PieceCommand> action)
-        {
-            throw new NotImplementedException();
-        }
+        public AsyncSubscription<IHandlePeerDownloads, BitFieldCommand> BitFieldCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerDownloads, HaveCommand> HaveCommandSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerDownloads, PieceCommand> PieceCommandSubscription { get; private set; }
 
         #endregion
     }

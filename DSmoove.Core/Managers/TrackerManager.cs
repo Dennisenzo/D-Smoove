@@ -1,6 +1,8 @@
 ﻿using Bencode;
 using DSmoove.Core.Config;
 using DSmoove.Core.Entities;
+using DSmoove.Core.Helpers;
+using DSmoove.Core.Interfaces;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ using System.Web;
 
 namespace DSmoove.Core.Managers
 {
-    public class TrackerManager
+    public class TrackerManager : IProvideTrackerUpdates
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -22,22 +24,33 @@ namespace DSmoove.Core.Managers
 
         private Timer _trackerUpdateTimer;
 
+        public AsyncSubscription<TrackerData, IProvideTrackerUpdates> TrackerUpdateSubscription { get; private set; }
+
         public TrackerManager(Torrent torrent)
         {
             _torrent = torrent;
             _trackerUpdateTimer = new Timer();
             _trackerUpdateTimer.AutoReset = false;
             _trackerUpdateTimer.Elapsed += Update;
+
+            TrackerUpdateSubscription = new AsyncSubscription<TrackerData, IProvideTrackerUpdates>();
         }
 
         public void Start()
         {
-            Update(null, null);
+           Update(null, null);
         }
 
-        public void Update(object sender, ElapsedEventArgs e)
+        private void Update(object sender, ElapsedEventArgs e)
+        {
+            Task updateTask = UpdateAsync();
+            Task.WaitAll(updateTask);
+        }
+
+        public async Task UpdateAsync()
         {
             log.Debug("Starting tracker update...");
+            _trackerUpdateTimer.Stop();
             UriQueryBuilder builder = new UriQueryBuilder(_torrent.Metadata.Announce);
 
             var infoHash = HttpUtility.UrlEncode(_torrent.Metadata.Hash);
@@ -55,6 +68,8 @@ namespace DSmoove.Core.Managers
             //var test = client.DownloadString(builder.ToString());
             var responseDictionary = BencodeUtility.DecodeDictionary(data);
 
+            TrackerData trackerData = new TrackerData();
+
             if (responseDictionary["peers"] is byte[])
             {
                 // Compact peer list.
@@ -68,7 +83,14 @@ namespace DSmoove.Core.Managers
 
                     ushort port = (ushort)BitConverter.ToInt16(portBytes, 0);
 
-                    _torrent.AddAndGetPeer(ip, port);
+                    trackerData.Peers.Add(new TrackerData.Peer()
+                        {
+                            IPAddress = ip,
+                            Port = port,
+                            PeerId = null
+                        });
+
+                   // _torrent.AddAndGetPeer(ip, port);
                 }
             }
             else
@@ -82,7 +104,11 @@ namespace DSmoove.Core.Managers
                 _trackerUpdateTimer.Interval = delay * 1000;
                 _trackerUpdateTimer.Start();
             }
+
+            await TrackerUpdateSubscription.TriggerAsync(trackerData, this);
+
             log.Debug("Finished tracker update!");
         }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSmoove.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,9 @@ namespace DSmoove.Core.Managers
         private DownloadManager _download;
         private ConnectionManager _connection;
 
-        private TransferManager()
+        public TransferManager(IProvideTrackerUpdates trackerUpdateProvider)
         {
-            _connection = new ConnectionManager();
+            _connection = new ConnectionManager(trackerUpdateProvider);
             _upload = new UploadManager(_connection);
             _download = new DownloadManager(_connection);
         }

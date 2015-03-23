@@ -1,4 +1,5 @@
-﻿using DSmoove.Core.PeerCommands;
+﻿using DSmoove.Core.Helpers;
+using DSmoove.Core.PeerCommands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace DSmoove.Core.Interfaces
         void SendRequestCommand(RequestCommand command);
         void SendCancelCommand(CancelCommand command);
 
-        void SubscribeToBitFieldCommand(Action<IHandlePeerDownloads, BitFieldCommand> action);
-        void SubscribeToHaveCommand(Action<IHandlePeerDownloads, HaveCommand> action);
-        void SubscribeToPieceCommand(Action<IHandlePeerDownloads, PieceCommand> action);
+        AsyncSubscription<IHandlePeerDownloads, BitFieldCommand> BitFieldCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerDownloads, HaveCommand> HaveCommandSubscription { get; }
+        AsyncSubscription<IHandlePeerDownloads, PieceCommand> PieceCommandSubscription { get; }
     }
 }

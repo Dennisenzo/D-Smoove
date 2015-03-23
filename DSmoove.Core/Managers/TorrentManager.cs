@@ -2,6 +2,7 @@
 using DSmoove.Core.Config;
 using DSmoove.Core.Entities;
 using DSmoove.Core.Enums;
+using DSmoove.Core.Interfaces;
 using DSmoove.Core.Providers;
 using log4net;
 using Stateless;
@@ -26,7 +27,7 @@ namespace DSmoove.Core.Managers
 
         private IProvideTorrent _torrentProvider;
 
-       // private OldTransferManager _peerManager;
+       private TransferManager _transferManager;
         private FileManager _fileManager;
         private TrackerManager _trackerManager;
         private PieceManager _pieceManager;
@@ -40,6 +41,7 @@ namespace DSmoove.Core.Managers
             _fileManager = new FileManager(Torrent);
           //  _peerManager = new OldTransferManager(Torrent, _fileManager);
             _trackerManager = new TrackerManager(Torrent);
+            _transferManager = new TransferManager(_trackerManager);
             _pieceManager = new PieceManager(Torrent);
             LastState = TorrentState.DownloadingMetadata;
         }
@@ -89,6 +91,7 @@ namespace DSmoove.Core.Managers
 
             _stateMachine.Fire(TorrentTrigger.Download);
         }
+
 
         private async void DownloadMetadata()
         {
