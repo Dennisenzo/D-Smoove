@@ -18,7 +18,7 @@ namespace DSmoove.Core.Managers
 
         internal void Start()
         {
-            throw new NotImplementedException();
+          //  throw new NotImplementedException();
         }
     }
 }

@@ -9,11 +9,11 @@ namespace DSmoove.Core.Config
     public class Settings
     {
         public static GeneralSettings General { get { return _instance._general; } }
-        public static TorrentSettings Torrent { get { return _instance._torrent; } }
+        public static ConnectionSettings Connection { get { return _instance._connection; } }
         public static FileSettings File { get { return _instance._file; } }
 
         private GeneralSettings _general;
-        private TorrentSettings _torrent;
+        private ConnectionSettings _connection;
         private FileSettings _file;
 
         private static Settings _instance;
@@ -29,9 +29,10 @@ namespace DSmoove.Core.Config
 
             _general.PeerId = "DS123123123123123123";
 
-            _torrent = new TorrentSettings();
+            _connection = new ConnectionSettings();
 
-            _torrent.ListeningPort = 6881;
+            _connection.ListeningPort = 6881;
+            _connection.MaxPeerConnections = 10;
 
             _file = new FileSettings();
 
@@ -42,17 +43,25 @@ namespace DSmoove.Core.Config
 
         public class GeneralSettings
         {
+            internal GeneralSettings() { }
+
             public string PeerId { get; set; }
         }
 
-        public class TorrentSettings
+        public class ConnectionSettings
         {
+            internal ConnectionSettings() { }
+
             public int ListeningPort { get; set; }
+            public int MaxPeerConnections { get; set; }
         }
+
+
         public class FileSettings
         {
-            public bool KeepWriteLockOpen { get; set; }
+            internal FileSettings() { }
 
+            public bool KeepWriteLockOpen { get; set; }
             public string DefaultDownloadFolder { get; set; }
         }
     }

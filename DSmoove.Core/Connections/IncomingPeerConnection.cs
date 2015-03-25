@@ -36,7 +36,7 @@ namespace DSmoove.Core.Connections
 
         public async void StartListeningAsync()
         {
-            TcpListener listener = new TcpListener(IPAddress.Any, Settings.Torrent.ListeningPort);
+            TcpListener listener = new TcpListener(IPAddress.Any, Settings.Connection.ListeningPort);
             listener.Start();
             while (!_cancellationToken.IsCancellationRequested)
             {

@@ -57,7 +57,7 @@ namespace DSmoove.Core.Managers
 
             builder.QueryString.Add("info_hash", infoHash);
             builder.QueryString.Add("peer_id", Settings.General.PeerId);
-            builder.QueryString.Add("port", Settings.Torrent.ListeningPort.ToString());
+            builder.QueryString.Add("port", Settings.Connection.ListeningPort.ToString());
             builder.QueryString.Add("left", _torrent.RemainingBytes.ToString());
             builder.QueryString.Add("uploaded", _torrent.UploadedBytes.ToString());
             builder.QueryString.Add("downloaded", _torrent.DownloadedBytes.ToString());

@@ -12,7 +12,7 @@ using DSmoove.Core.Helpers;
 
 namespace DSmoove.Core.Connections
 {
-    public class PeerConnection :IProvidePeerMessages
+    public class PeerConnection : IProvidePeerMessages
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private TcpClient _tcpClient;
@@ -22,7 +22,9 @@ namespace DSmoove.Core.Connections
         public int Port { get; private set; }
 
         public AsyncSubscription<IProvidePeerMessages, byte[]> PeerMessageSubscription { get; private set; }
-        public AsyncSubscription<IProvidePeerMessages, byte[]> PeerHandshakeSubscription { get;private set; }
+        public AsyncSubscription<IProvidePeerMessages, byte[]> PeerHandshakeSubscription { get; private set; }
+
+        public PeerConnectionStatus Status { get; private set; }
 
         private Task _readTask;
 
@@ -30,6 +32,7 @@ namespace DSmoove.Core.Connections
         {
             PeerMessageSubscription = new AsyncSubscription<IProvidePeerMessages, byte[]>();
             PeerHandshakeSubscription = new AsyncSubscription<IProvidePeerMessages, byte[]>();
+            Status = PeerConnectionStatus.Disconnected;
         }
         public PeerConnection(IPAddress ipAddress, int port)
             : this()
@@ -51,6 +54,7 @@ namespace DSmoove.Core.Connections
 
         public async Task<bool> Connect()
         {
+            Status = PeerConnectionStatus.Connecting;
             try
             {
                 if (_tcpClient == null)
@@ -65,8 +69,18 @@ namespace DSmoove.Core.Connections
             }
             catch (Exception e)
             {
+
                 log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
                 return false;
+            }
+
+            if (_tcpClient.Connected)
+            {
+                Status = PeerConnectionStatus.Connected;
+            }
+            else
+            {
+                Status = PeerConnectionStatus.Disconnected;
             }
 
             return _tcpClient.Connected;
@@ -85,7 +99,12 @@ namespace DSmoove.Core.Connections
                 catch (Exception e)
                 {
                     log.WarnFormat("Could not send data to {0}:{1} ({2})", Address, Port, e.Message);
+                    Status = PeerConnectionStatus.Disconnected;
                 }
+            }
+            else
+            {
+                Status = PeerConnectionStatus.Disconnected;
             }
         }
 
@@ -122,7 +141,7 @@ namespace DSmoove.Core.Connections
                     if (messageLength == 0)
                     {
                         await PeerMessageSubscription.TriggerAsync(this, new byte[0]);
-      
+
                     }
                     else
                     {
@@ -139,6 +158,7 @@ namespace DSmoove.Core.Connections
             catch (IOException e)
             {
                 log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
+                Status = PeerConnectionStatus.Disconnected;
             }
         }
 
@@ -152,6 +172,13 @@ namespace DSmoove.Core.Connections
             int messageLength = BitConverter.ToInt32(data.Reverse().ToArray(), 0);
             return messageLength;
         }
+    }
+
+    public enum PeerConnectionStatus
+    {
+        Disconnected,
+        Connecting,
+        Connected
     }
 }
 //        

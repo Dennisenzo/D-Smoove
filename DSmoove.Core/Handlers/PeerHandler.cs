@@ -28,6 +28,8 @@ namespace DSmoove.Core.Handlers
 
         private PeerConnection _peerConnection;
 
+        public PeerConnectionStatus Status { get { return _peerConnection.Status; } }
+
         #endregion
 
         #region Constructors
@@ -52,6 +54,16 @@ namespace DSmoove.Core.Handlers
             BitFieldCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, BitFieldCommand>();
             HaveCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, HaveCommand>();
             PieceCommandSubscription = new AsyncSubscription<IHandlePeerDownloads, PieceCommand>();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+
+        public Task<bool> Connect()
+        {
+         return   _peerConnection.Connect();
         }
 
         #endregion
