@@ -26,20 +26,29 @@ namespace DSmoove.Core.Handlers
         public int Port { get; private set; }
         public string PeerId { get; private set; }
 
+        private byte[] _infoHash;
+
         private PeerConnection _peerConnection;
 
-        public PeerConnectionStatus Status { get { return _peerConnection.Status; } }
+        public PeerConnectionStatus Status { get; private set; }
 
         #endregion
 
         #region Constructors
 
-        public PeerHandler(IPAddress ipAddress, int port, string peerId)
+        public PeerHandler(IPAddress ipAddress, int port, string peerId, byte[] infoHash)
         {
             _peerConnection = new PeerConnection(ipAddress, port);
             _peerConnection.PeerHandshakeSubscription.Subscribe(HandleHandshakeMessage);
             _peerConnection.PeerMessageSubscription.Subscribe(HandlePeerMessage);
+            _peerConnection.PeerConnectedSubscription.Subscribe(PeerConnected);
+            _peerConnection.PeerDisconnectedSubscription.Subscribe(PeerDisconnected);
+
+            IPAddress = ipAddress;
+            Port = port;
+
             PeerId = peerId;
+            _infoHash = infoHash;
 
             HandshakeCommandSubscription = new AsyncSubscription<IHandlePeerConnection, HandshakeCommand>();
             PortCommandSubscription = new AsyncSubscription<IHandlePeerConnection, PortCommand>();
@@ -58,26 +67,139 @@ namespace DSmoove.Core.Handlers
 
         #endregion
 
+        #region Peer Messages
+
+        private void PeerDisconnected(IProvidePeerMessages source)
+        {
+            Status = PeerConnectionStatus.Disconnected;
+                   }
+
+        private void PeerConnected(IProvidePeerMessages source)
+        {
+                        Status = PeerConnectionStatus.Connected;
+
+            HandshakeCommand command = new HandshakeCommand()
+            {
+                InfoHash = _infoHash
+            };
+
+            _peerConnection.SendAsync(command.ToByteArray());
+        }
+
+                #endregion
+
         #region Public Methods
 
 
         public Task<bool> Connect()
         {
-         return   _peerConnection.Connect();
+            Status = PeerConnectionStatus.Connecting;
+            return _peerConnection.Connect();
         }
 
         #endregion
 
-        #region IHandlePeerMessages
+        #region Peer Messages
 
         public void HandlePeerMessage(IProvidePeerMessages source, byte[] messageData)
         {
-            throw new NotImplementedException();
+            if (messageData == null)
+            {
+                log.DebugFormat("Received KeepAlive message from {0}:{1}.", IPAddress.ToString(), Port);
+
+            }
+            else
+            {
+                switch ((PeerCommandId)messageData[0])
+                {
+                    case PeerCommandId.Choke:
+                        {
+                            log.DebugFormat("Received Choke message from {0}:{1}.", IPAddress.ToString(), Port);
+                            ChokeCommand command = new ChokeCommand();
+                            command.FromByteArray(messageData);
+                            ChokeCommandSubscription.TriggerAsync(this, command);
+                            break;
+                        }
+                    case PeerCommandId.Unchoke:
+                        {
+                            log.DebugFormat("Received Unchoke message from {0}:{1}.", IPAddress, Port);
+
+
+                            break;
+                        }
+                    case PeerCommandId.Interested:
+                        {
+                            log.DebugFormat("Received Interested message from {0}:{1}.", IPAddress, Port);
+
+                            break;
+                        }
+                    case PeerCommandId.NotInterested:
+                        {
+                            log.DebugFormat("Received NotInterested message from {0}:{1}.", IPAddress, Port);
+
+                            break;
+                        }
+                    case PeerCommandId.BitField:
+                        {
+                            log.DebugFormat("Received BitField message from {0}:{1}.", IPAddress, Port);
+
+                            BitFieldCommand bitField = new BitFieldCommand();
+
+                            bitField.FromByteArray(messageData);
+
+                            //Peer.BitField = bitField.Downloaded;
+
+                            //  log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+
+
+
+                            break;
+                        }
+                    case PeerCommandId.Have:
+                        {
+                            log.DebugFormat("Received Have message from {0}:{1}.", IPAddress, Port);
+
+                            HaveCommand have = new HaveCommand();
+
+                            have.FromByteArray(messageData);
+
+                            //   Peer.SetDownloaded(have.PieceIndex);
+
+                            //    log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
+
+
+
+                            break;
+                        }
+
+                    case PeerCommandId.Request:
+                        {
+                            log.DebugFormat("Received Request message from {0}:{1}.", IPAddress, Port);
+
+                            RequestCommand request = new RequestCommand();
+
+                            request.FromByteArray(messageData);
+
+                            break;
+                        }
+
+                    default:
+                        {
+                            log.Warn("Weird data received!");
+                            break;
+                        }
+                }
+            }
         }
+
 
         public void HandleHandshakeMessage(IProvidePeerMessages source, byte[] handshakeData)
         {
-            throw new NotImplementedException();
+            HandshakeCommand command = new HandshakeCommand();
+
+            command.FromByteArray(handshakeData);
+
+            PeerId = command.PeerId;
         }
 
         #endregion
@@ -164,7 +286,6 @@ namespace DSmoove.Core.Handlers
         #endregion
     }
 }
-
 //        private PeerConnection _connection;
 
 //        public Peer Peer { get; private set; }

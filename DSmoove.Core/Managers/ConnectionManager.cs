@@ -71,15 +71,15 @@ namespace DSmoove.Core.Managers
         {
             foreach (var peer in data.Peers)
             {
-                AddPeer(peer.IPAddress, peer.Port, peer.PeerId);
+                AddPeer(peer.IPAddress, peer.Port, data.InfoHash, peer.PeerId);
             }
         }
 
-        public void AddPeer(IPAddress address, int port, string peerId = null)
+        public void AddPeer(IPAddress address, int port, byte[] infoHash, string peerId)
         {
             if (!_peerHandlers.Any(p => p.IPAddress == address && p.Port == port))
             {
-                PeerHandler peerHandler = new PeerHandler(address, port, peerId);
+                PeerHandler peerHandler = new PeerHandler(address, port, peerId, infoHash);
                 _peerHandlers.Add(peerHandler);
             }
         }

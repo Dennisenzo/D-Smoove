@@ -24,7 +24,8 @@ namespace DSmoove.Core.Connections
         public AsyncSubscription<IProvidePeerMessages, byte[]> PeerMessageSubscription { get; private set; }
         public AsyncSubscription<IProvidePeerMessages, byte[]> PeerHandshakeSubscription { get; private set; }
 
-        public PeerConnectionStatus Status { get; private set; }
+        public AsyncSubscription<IProvidePeerMessages> PeerConnectedSubscription { get; private set; }
+        public AsyncSubscription<IProvidePeerMessages> PeerDisconnectedSubscription { get; private set; }
 
         private Task _readTask;
 
@@ -32,8 +33,11 @@ namespace DSmoove.Core.Connections
         {
             PeerMessageSubscription = new AsyncSubscription<IProvidePeerMessages, byte[]>();
             PeerHandshakeSubscription = new AsyncSubscription<IProvidePeerMessages, byte[]>();
-            Status = PeerConnectionStatus.Disconnected;
+
+            PeerConnectedSubscription = new AsyncSubscription<IProvidePeerMessages>();
+            PeerDisconnectedSubscription = new AsyncSubscription<IProvidePeerMessages>();
         }
+
         public PeerConnection(IPAddress ipAddress, int port)
             : this()
         {
@@ -54,7 +58,6 @@ namespace DSmoove.Core.Connections
 
         public async Task<bool> Connect()
         {
-            Status = PeerConnectionStatus.Connecting;
             try
             {
                 if (_tcpClient == null)
@@ -76,11 +79,11 @@ namespace DSmoove.Core.Connections
 
             if (_tcpClient.Connected)
             {
-                Status = PeerConnectionStatus.Connected;
+                await PeerConnectedSubscription.TriggerAsync(this);
             }
             else
             {
-                Status = PeerConnectionStatus.Disconnected;
+                await PeerDisconnectedSubscription.TriggerAsync(this);
             }
 
             return _tcpClient.Connected;
@@ -99,12 +102,12 @@ namespace DSmoove.Core.Connections
                 catch (Exception e)
                 {
                     log.WarnFormat("Could not send data to {0}:{1} ({2})", Address, Port, e.Message);
-                    Status = PeerConnectionStatus.Disconnected;
+                    PeerDisconnectedSubscription.Trigger(this);
                 }
             }
             else
             {
-                Status = PeerConnectionStatus.Disconnected;
+                PeerDisconnectedSubscription.Trigger(this);
             }
         }
 
@@ -158,7 +161,7 @@ namespace DSmoove.Core.Connections
             catch (IOException e)
             {
                 log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
-                Status = PeerConnectionStatus.Disconnected;
+                PeerDisconnectedSubscription.Trigger(this);
             }
         }
 

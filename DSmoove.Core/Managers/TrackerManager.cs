@@ -69,6 +69,7 @@ namespace DSmoove.Core.Managers
             var responseDictionary = BencodeUtility.DecodeDictionary(data);
 
             TrackerData trackerData = new TrackerData();
+            trackerData.InfoHash = _torrent.Metadata.Hash;
 
             if (responseDictionary["peers"] is byte[])
             {

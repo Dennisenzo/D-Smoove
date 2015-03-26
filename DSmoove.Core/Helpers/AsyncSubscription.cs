@@ -6,39 +6,75 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Helpers
 {
-   public class AsyncSubscription<Data, Source>
+    public class AsyncSubscription<Data, Source>
     {
-       private List<Action<Data, Source>> _subscriptions;
+        private List<Action<Data, Source>> _subscriptions;
 
-       public AsyncSubscription()
-       {
-           _subscriptions = new List<Action<Data, Source>>();
-       }
+        public AsyncSubscription()
+        {
+            _subscriptions = new List<Action<Data, Source>>();
+        }
 
-       public void Subscribe(Action<Data, Source> action)
-       {
-           _subscriptions.Add(action);
-       }
+        public void Subscribe(Action<Data, Source> action)
+        {
+            _subscriptions.Add(action);
+        }
 
-       public void Unsubscribe(Action<Data, Source> action)
-       {
-           _subscriptions.Remove(action);
-       }
+        public void Unsubscribe(Action<Data, Source> action)
+        {
+            _subscriptions.Remove(action);
+        }
 
-       public void Trigger(Data data, Source source)
-       {
-           foreach (var subscription in _subscriptions)
-           {
-               subscription.Invoke(data, source);
-           }
-       }
+        public void Trigger(Data data, Source source)
+        {
+            foreach (var subscription in _subscriptions)
+            {
+                subscription.Invoke(data, source);
+            }
+        }
 
-       public Task TriggerAsync(Data data, Source source)
-       {
-           return Task.Factory.StartNew(() =>
-           {
-               Trigger(data, source);
-           });
-       }
+        public Task TriggerAsync(Data data, Source source)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                Trigger(data, source);
+            });
+        }
+    }
+
+    public class AsyncSubscription<Source>
+    {
+        private List<Action<Source>> _subscriptions;
+
+        public AsyncSubscription()
+        {
+            _subscriptions = new List<Action<Source>>();
+        }
+
+        public void Subscribe(Action<Source> action)
+        {
+            _subscriptions.Add(action);
+        }
+
+        public void Unsubscribe(Action<Source> action)
+        {
+            _subscriptions.Remove(action);
+        }
+
+        public void Trigger(Source source)
+        {
+            foreach (var subscription in _subscriptions)
+            {
+                subscription.Invoke(source);
+            }
+        }
+
+        public Task TriggerAsync(Source source)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                Trigger(source);
+            });
+        }
     }
 }

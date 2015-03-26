@@ -21,12 +21,12 @@ namespace DSmoove.Core.Managers
 
         public void Start()
         {
-         //   _stateMachine.Fire(DownloadTrigger.Start);
+            //   _stateMachine.Fire(DownloadTrigger.Start);
         }
 
         public void Stop()
         {
-          //  _stateMachine.Fire(DownloadTrigger.Start);
+            //  _stateMachine.Fire(DownloadTrigger.Start);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace DSmoove.Core.Entities
     {
         public List<PeerData> Peers { get; set; }
         public DateTime UpdateTime { get; private set; }
+        public byte[] InfoHash { get; set; }
 
         public TrackerData()
         {
