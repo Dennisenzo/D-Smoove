@@ -16,7 +16,7 @@ using System.Web;
 
 namespace DSmoove.Core.Managers
 {
-    public class TrackerManager : IProvideTrackerUpdates
+    public class TrackerManager 
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -24,16 +24,15 @@ namespace DSmoove.Core.Managers
 
         private Timer _trackerUpdateTimer;
 
-        public AsyncSubscription<TrackerData, IProvideTrackerUpdates> TrackerUpdateSubscription { get; private set; }
+        public AsyncSubscription<TrackerData, TrackerManager> UpdateSubscription { get; private set; }
 
-        public TrackerManager(Torrent torrent)
+        public TrackerManager()
         {
-            _torrent = torrent;
             _trackerUpdateTimer = new Timer();
             _trackerUpdateTimer.AutoReset = false;
             _trackerUpdateTimer.Elapsed += Update;
 
-            TrackerUpdateSubscription = new AsyncSubscription<TrackerData, IProvideTrackerUpdates>();
+            UpdateSubscription = new AsyncSubscription<TrackerData, TrackerManager>();
         }
 
         public void Start()
@@ -65,7 +64,6 @@ namespace DSmoove.Core.Managers
             WebClient client = new WebClient();
 
             var data = client.DownloadData(builder.ToString());
-            //var test = client.DownloadString(builder.ToString());
             var responseDictionary = BencodeUtility.DecodeDictionary(data);
 
             TrackerData trackerData = new TrackerData();
@@ -90,8 +88,6 @@ namespace DSmoove.Core.Managers
                             Port = port,
                             PeerId = null
                         });
-
-                   // _torrent.AddAndGetPeer(ip, port);
                 }
             }
             else
@@ -106,7 +102,7 @@ namespace DSmoove.Core.Managers
                 _trackerUpdateTimer.Start();
             }
 
-            await TrackerUpdateSubscription.TriggerAsync(trackerData, this);
+            await UpdateSubscription.TriggerAsync(trackerData, this);
 
             log.Debug("Finished tracker update!");
         }

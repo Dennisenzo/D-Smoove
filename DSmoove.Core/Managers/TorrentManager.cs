@@ -4,7 +4,9 @@ using DSmoove.Core.Entities;
 using DSmoove.Core.Enums;
 using DSmoove.Core.Interfaces;
 using DSmoove.Core.Providers;
+using EasyMemoryRepository;
 using log4net;
+using Ninject;
 using Stateless;
 using System;
 using System.Collections.Generic;
@@ -21,28 +23,30 @@ namespace DSmoove.Core.Managers
 
         private StateMachine<TorrentState, TorrentTrigger> _stateMachine;
 
-        public Torrent Torrent { get; private set; }
-
         public TorrentState LastState { get; private set; }
 
         private IProvideTorrent _torrentProvider;
 
-       private TransferManager _transferManager;
-        private FileManager _fileManager;
-        private TrackerManager _trackerManager;
-        private PieceManager _pieceManager;
+        [Inject]
+        public TransferManager TransferManager { get; set; }
 
-        public TorrentManager(IProvideTorrent torrentProvider)
+        [Inject]
+        public FileManager FileManager { get; set; }
+
+        [Inject]
+        public TrackerManager TrackerManager { get; set; }
+
+        [Inject]
+        public PieceManager PieceManager { get; set; }
+
+        [Inject]
+        public MemoryRepository MemoryRepository { get; set; }
+
+        public TorrentManager()
         {
             log.Info("Starting new torrent manager.");
             ConfigureStateMachine(TorrentState.Stopped);
-            _torrentProvider = torrentProvider;
-            Torrent = new Torrent();
-            _fileManager = new FileManager(Torrent);
-          //  _peerManager = new OldTransferManager(Torrent, _fileManager);
-            _trackerManager = new TrackerManager(Torrent);
-            _transferManager = new TransferManager(_trackerManager);
-            _pieceManager = new PieceManager(Torrent);
+
             LastState = TorrentState.DownloadingMetadata;
         }
 
@@ -78,16 +82,22 @@ namespace DSmoove.Core.Managers
                 .Permit(TorrentTrigger.Stop, TorrentState.Stopped);
         }
 
+        public void Load(IProvideTorrent torrentProvider)
+        {
+            _torrentProvider = torrentProvider;
+            Start();
+        }
+
         private void Download()
         {
             log.Info("Starting torrent download.");
-            _transferManager.Start();
+            TransferManager.Start();
         }
 
         private void ConnectToTracker()
         {
             log.Info("Connecting to tracker.");
-            _trackerManager.Start();
+            TrackerManager.Start();
 
             _stateMachine.Fire(TorrentTrigger.Download);
         }
@@ -96,11 +106,16 @@ namespace DSmoove.Core.Managers
         private async void DownloadMetadata()
         {
             log.Info("Downloading Metadata.");
-            Torrent.Metadata = await _torrentProvider.GetMetadataAsync();
-            Torrent.Files = await _fileManager.LoadFilesAsync();
-            Torrent.Pieces = new PieceList(await _pieceManager.LoadPiecesAsync());
-            
-            await _fileManager.PrepareFilesAsync(Settings.File.DefaultDownloadFolder);
+
+            Torrent torrent = new Torrent();
+
+            MemoryRepository.Add<Torrent>(torrent);
+
+            torrent.Metadata = await _torrentProvider.GetMetadataAsync();
+            torrent.Files = await FileManager.LoadFilesAsync();
+            torrent.Pieces = new PieceList(await PieceManager.LoadPiecesAsync());
+
+            await FileManager.PrepareFilesAsync(Settings.File.DefaultDownloadFolder);
 
             _stateMachine.Fire(TorrentTrigger.ConnectToTracker);
         }

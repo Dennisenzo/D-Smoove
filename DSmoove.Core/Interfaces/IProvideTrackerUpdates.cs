@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Interfaces
 {
-public interface IProvideTrackerUpdates
+    public interface TrackerManagerIProvideTrackerUpdates
     {
     AsyncSubscription<TrackerData, IProvideTrackerUpdates> TrackerUpdateSubscription { get; }
     }

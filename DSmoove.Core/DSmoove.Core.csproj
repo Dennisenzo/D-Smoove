@@ -35,11 +35,17 @@
     <Reference Include="Bencode">
       <HintPath>..\packages\Bencode.1.1.0\lib\Bencode.dll</HintPath>
     </Reference>
+    <Reference Include="EasyMemoryRepository">
+      <HintPath>..\packages\EasyMemoryRepository.1.0.5567.22845\lib\net451\EasyMemoryRepository.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Ninject">
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.NamedScope">
+      <HintPath>..\packages\Ninject.Extensions.NamedScope.3.2.0.0\lib\net45-full\Ninject.Extensions.NamedScope.dll</HintPath>
     </Reference>
     <Reference Include="Stateless">
       <HintPath>..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>
@@ -76,6 +82,7 @@
     <Compile Include="Extensions\NetworkStreamExtensions.cs" />
     <Compile Include="Handlers\PeerHandler.cs" />
     <Compile Include="Helpers\AsyncSubscription.cs" />
+    <Compile Include="Interfaces\IManageTorrentFiles.cs" />
     <Compile Include="Interfaces\IProvidePeers.cs" />
     <Compile Include="Interfaces\IHandlePeerConnection.cs" />
     <Compile Include="Interfaces\IHandlePeerDownloads.cs" />
@@ -112,6 +119,7 @@
     <Compile Include="Managers\TrackerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\UriTorrentProvider.cs" />
+    <Compile Include="Repositories\TorrentRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />

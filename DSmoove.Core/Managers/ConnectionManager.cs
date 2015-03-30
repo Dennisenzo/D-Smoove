@@ -3,6 +3,7 @@ using DSmoove.Core.Connections;
 using DSmoove.Core.Entities;
 using DSmoove.Core.Handlers;
 using DSmoove.Core.Interfaces;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +21,18 @@ namespace DSmoove.Core.Managers
         private Task _connectionTask;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
+        [Inject]
+        public TrackerManager TrackerManager { get; set; }
         
 
-        public ConnectionManager(IProvideTrackerUpdates trackerUpdatesProvider)
+        public ConnectionManager()
         {
             _peerHandlers = new List<PeerHandler>();
-            trackerUpdatesProvider.TrackerUpdateSubscription.Subscribe(UpdatePeersFromTracker);
         }
 
         public void Start()
         {
+            TrackerManager.UpdateSubscription.Subscribe(UpdatePeersFromTracker);
             _cancellationTokenSource = new CancellationTokenSource();
             _connectionTask = MaintainConnections();
         }
@@ -66,8 +69,8 @@ namespace DSmoove.Core.Managers
                 }
             }, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
         }
-        
-        private void UpdatePeersFromTracker(TrackerData data, IProvideTrackerUpdates source)
+
+        private void UpdatePeersFromTracker(TrackerData data, TrackerManager source)
         {
             foreach (var peer in data.Peers)
             {
