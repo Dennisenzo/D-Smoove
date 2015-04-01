@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Managers
 {
-    public class ConnectionManager : IProvidePeers
+    public class ConnectionManager : IProvidePeerConnections
     {
         private List<PeerHandler> _peerHandlers;
 
@@ -22,17 +22,18 @@ namespace DSmoove.Core.Managers
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         [Inject]
-        public TrackerManager TrackerManager { get; set; }
+        public IProvideTrackerUpdates TrackerUpdateProvider { get; set; }
         
 
         public ConnectionManager()
         {
+         
             _peerHandlers = new List<PeerHandler>();
         }
 
         public void Start()
         {
-            TrackerManager.UpdateSubscription.Subscribe(UpdatePeersFromTracker);
+            TrackerUpdateProvider.UpdateSubscription.Subscribe(UpdatePeersFromTracker);
             _cancellationTokenSource = new CancellationTokenSource();
             _connectionTask = MaintainConnections();
         }
@@ -70,7 +71,7 @@ namespace DSmoove.Core.Managers
             }, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
         }
 
-        private void UpdatePeersFromTracker(TrackerData data, TrackerManager source)
+        private void UpdatePeersFromTracker(TrackerData data, IProvideTrackerUpdates source)
         {
             foreach (var peer in data.Peers)
             {

@@ -1,5 +1,7 @@
 ﻿using DSmoove.Core.Connections;
 using DSmoove.Core.Entities;
+using EasyMemoryRepository;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,31 +13,30 @@ namespace DSmoove.Core.Managers
 {
     public class FileManager
     {
-        private Torrent _torrent;
-        private string _folder;
-
         private List<FileConnection> _fileConnections;
 
-        public FileManager(Torrent torrent, string folder = null)
-        {
-            _torrent = torrent;
-            _folder = folder;
+        [Inject]
+        public MemoryRepository MemoryRepository { get; set; }
 
+        public FileManager()
+        {
             _fileConnections = new List<FileConnection>();
         }
 
-        public async Task<List<TorrentFile>> LoadFilesAsync()
+        public async Task<List<TorrentFile>> LoadFilesAsync(Guid torrentId)
         {
+            var torrent = MemoryRepository.SingleOrDefault<Torrent>(t => t.Id == torrentId);
+
             Task<List<TorrentFile>> task = Task.Factory.StartNew<List<TorrentFile>>(() =>
                 {
                     List<TorrentFile> torrentFiles = new List<TorrentFile>();
                     long offset = 0;
 
-                    foreach (var fileInfo in _torrent.Metadata.Info.Files)
+                    foreach (var fileInfo in torrent.Metadata.Info.Files)
                     {
                         TorrentFile file = new TorrentFile()
                         {
-                            Range = new DataRange(offset,fileInfo.Length),
+                            Range = new DataRange(offset, fileInfo.Length),
                             Name = string.Join("", fileInfo.Path.ToArray()),
                         };
 
@@ -43,25 +44,25 @@ namespace DSmoove.Core.Managers
 
                         offset += file.Range.Length;
                     }
-                   
+
                     return torrentFiles;
                 });
 
             return await task;
         }
 
-        public async Task PrepareFilesAsync(string folder)
+        public async Task PrepareFilesAsync(Guid torrentId, string folder)
         {
-            _folder = folder;
+            var torrent = MemoryRepository.SingleOrDefault<Torrent>(t => t.Id == torrentId);
 
-            if (!Directory.Exists(_folder))
+            if (!Directory.Exists(folder))
             {
-                Directory.CreateDirectory(_folder);
+                Directory.CreateDirectory(folder);
             }
 
-            foreach (var file in _torrent.Files)
+            foreach (var file in torrent.Files)
             {
-                var path = Path.Combine(_folder, file.Name);
+                var path = Path.Combine(folder, file.Name);
 
                 FileConnection connection = new FileConnection(file.Id, path, file.Range.Length);
 
@@ -73,22 +74,24 @@ namespace DSmoove.Core.Managers
 
         public void WritePiece(Piece piece)
         {
-            TorrentFile file = _torrent.Files.First();
+            var torrent = MemoryRepository.SingleOrDefault<Torrent>(t => t.Id == piece.TorrentId);
+
+            TorrentFile file = torrent.Files.First();
             int fileIndex = 0;
 
             // Find the first file.
             while (file.Range.FirstByte > piece.Range.FirstByte)
             {
                 fileIndex++;
-                file = _torrent.Files[fileIndex];
+                file = torrent.Files[fileIndex];
             }
 
             if (file.Range.LastByte >= piece.Range.LastByte)
             {
                 // Only file to update.
-               var connection = _fileConnections.Single(f => f.FileId == file.Id);
+                var connection = _fileConnections.Single(f => f.FileId == file.Id);
 
-               int offset = (int)(piece.Range.FirstByte - file.Range.FirstByte);
+                int offset = (int)(piece.Range.FirstByte - file.Range.FirstByte);
 
                 connection.Write(new FileWriteCommand(piece.GetPieceData(), offset));
             }
@@ -105,18 +108,18 @@ namespace DSmoove.Core.Managers
                     long writeSize = file.Range.LastByte - (file.Range.FirstByte + offset);
 
                     byte[] data = new byte[writeSize];
-                    
+
                     Array.Copy(piece.GetPieceData(), dataWritten, data, 0, writeSize);
                     piece.GetPieceData().CopyTo(data, 0);
 
                     connection.Write(new FileWriteCommand(data, offset));
-                   
+
                     dataWritten += writeSize;
                     fileIndex++;
-                    file = _torrent.Files[fileIndex];
+                    file = torrent.Files[fileIndex];
                 }
             }
-       
+
         }
 
     }

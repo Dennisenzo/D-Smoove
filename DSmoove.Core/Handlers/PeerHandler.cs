@@ -6,6 +6,7 @@ using DSmoove.Core.PeerCommands;
 using log4net;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -32,6 +33,8 @@ namespace DSmoove.Core.Handlers
 
         public PeerConnectionStatus Status { get; private set; }
 
+        public ConcurrentQueue<BasePeerCommand> CommandQueue { get; set; }
+
         #endregion
 
         #region Constructors
@@ -49,6 +52,9 @@ namespace DSmoove.Core.Handlers
 
             PeerId = peerId;
             _infoHash = infoHash;
+
+            PeerConnectedSubscription = new AsyncSubscription<IHandlePeerConnection>();
+            PeerDisconnectedSubscription = new AsyncSubscription<IHandlePeerConnection>();
 
             HandshakeCommandSubscription = new AsyncSubscription<IHandlePeerConnection, HandshakeCommand>();
             PortCommandSubscription = new AsyncSubscription<IHandlePeerConnection, PortCommand>();
@@ -72,11 +78,12 @@ namespace DSmoove.Core.Handlers
         private void PeerDisconnected(IProvidePeerMessages source)
         {
             Status = PeerConnectionStatus.Disconnected;
-                   }
+            PeerDisconnectedSubscription.Trigger(this);
+        }
 
         private void PeerConnected(IProvidePeerMessages source)
         {
-                        Status = PeerConnectionStatus.Connected;
+            Status = PeerConnectionStatus.Connected;
 
             HandshakeCommand command = new HandshakeCommand()
             {
@@ -86,7 +93,7 @@ namespace DSmoove.Core.Handlers
             _peerConnection.SendAsync(command.ToByteArray());
         }
 
-                #endregion
+        #endregion
 
         #region Public Methods
 
@@ -200,6 +207,8 @@ namespace DSmoove.Core.Handlers
             command.FromByteArray(handshakeData);
 
             PeerId = command.PeerId;
+
+            PeerConnectedSubscription.Trigger(this);
         }
 
         #endregion
@@ -235,6 +244,9 @@ namespace DSmoove.Core.Handlers
         {
             throw new NotImplementedException();
         }
+
+        public AsyncSubscription<IHandlePeerConnection> PeerConnectedSubscription { get; private set; }
+        public AsyncSubscription<IHandlePeerConnection> PeerDisconnectedSubscription { get; private set; }
 
         public AsyncSubscription<IHandlePeerConnection, HandshakeCommand> HandshakeCommandSubscription { get; private set; }
         public AsyncSubscription<IHandlePeerConnection, PortCommand> PortCommandSubscription { get; private set; }

@@ -44,6 +44,18 @@
     <Reference Include="Ninject">
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
+    <Reference Include="Ninject.Extensions.ChildKernel">
+      <HintPath>..\packages\Ninject.Extensions.ChildKernel.3.2.0.0\lib\net45-full\Ninject.Extensions.ChildKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.ContextPreservation">
+      <HintPath>..\packages\Ninject.Extensions.ContextPreservation.3.2.0.0\lib\net45-full\Ninject.Extensions.ContextPreservation.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging">
+      <HintPath>..\packages\Ninject.Extensions.Logging.3.2.0.0\lib\net45-full\Ninject.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging.Log4Net">
+      <HintPath>..\packages\Ninject.Extensions.Logging.Log4net.3.2.2.0\lib\net45-full\Ninject.Extensions.Logging.Log4Net.dll</HintPath>
+    </Reference>
     <Reference Include="Ninject.Extensions.NamedScope">
       <HintPath>..\packages\Ninject.Extensions.NamedScope.3.2.0.0\lib\net45-full\Ninject.Extensions.NamedScope.dll</HintPath>
     </Reference>
@@ -63,6 +75,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandQueue.cs" />
     <Compile Include="Config\IocModule.cs" />
     <Compile Include="Connections\FileConnection.cs" />
     <Compile Include="Connections\IncomingPeerConnection.cs" />
@@ -83,7 +96,7 @@
     <Compile Include="Handlers\PeerHandler.cs" />
     <Compile Include="Helpers\AsyncSubscription.cs" />
     <Compile Include="Interfaces\IManageTorrentFiles.cs" />
-    <Compile Include="Interfaces\IProvidePeers.cs" />
+    <Compile Include="Interfaces\IProvidePeerConnections.cs" />
     <Compile Include="Interfaces\IHandlePeerConnection.cs" />
     <Compile Include="Interfaces\IHandlePeerDownloads.cs" />
     <Compile Include="Interfaces\IProvidePeerMessages.cs" />
@@ -122,6 +135,7 @@
     <Compile Include="Repositories\TorrentRepository.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>

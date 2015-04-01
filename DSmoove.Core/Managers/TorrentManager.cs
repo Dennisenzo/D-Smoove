@@ -27,6 +27,8 @@ namespace DSmoove.Core.Managers
 
         private IProvideTorrent _torrentProvider;
 
+        public Guid TorrentId { get; private set; }
+
         [Inject]
         public TransferManager TransferManager { get; set; }
 
@@ -91,14 +93,13 @@ namespace DSmoove.Core.Managers
         private void Download()
         {
             log.Info("Starting torrent download.");
-            TransferManager.Start();
         }
 
         private void ConnectToTracker()
         {
             log.Info("Connecting to tracker.");
-            TrackerManager.Start();
-
+            TransferManager.Start();
+            TrackerManager.Start(TorrentId);
             _stateMachine.Fire(TorrentTrigger.Download);
         }
 
@@ -109,13 +110,15 @@ namespace DSmoove.Core.Managers
 
             Torrent torrent = new Torrent();
 
+            TorrentId = torrent.Id;
+
             MemoryRepository.Add<Torrent>(torrent);
 
             torrent.Metadata = await _torrentProvider.GetMetadataAsync();
-            torrent.Files = await FileManager.LoadFilesAsync();
-            torrent.Pieces = new PieceList(await PieceManager.LoadPiecesAsync());
+            torrent.Files = await FileManager.LoadFilesAsync(TorrentId);
+            torrent.Pieces = new PieceList(await PieceManager.LoadPiecesAsync(TorrentId));
 
-            await FileManager.PrepareFilesAsync(Settings.File.DefaultDownloadFolder);
+            await FileManager.PrepareFilesAsync(torrent.Id, Settings.File.DefaultDownloadFolder);
 
             _stateMachine.Fire(TorrentTrigger.ConnectToTracker);
         }

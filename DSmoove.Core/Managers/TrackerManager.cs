@@ -3,7 +3,9 @@ using DSmoove.Core.Config;
 using DSmoove.Core.Entities;
 using DSmoove.Core.Helpers;
 using DSmoove.Core.Interfaces;
+using EasyMemoryRepository;
 using log4net;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,15 +18,18 @@ using System.Web;
 
 namespace DSmoove.Core.Managers
 {
-    public class TrackerManager 
+    public class TrackerManager : IProvideTrackerUpdates
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private Torrent _torrent;
+        public Guid TorrentId { get; private set; }
 
         private Timer _trackerUpdateTimer;
 
-        public AsyncSubscription<TrackerData, TrackerManager> UpdateSubscription { get; private set; }
+        [Inject]
+        public MemoryRepository MemoryRepository { get; set; }
+
+        public AsyncSubscription<TrackerData, IProvideTrackerUpdates> UpdateSubscription { get; private set; }
 
         public TrackerManager()
         {
@@ -32,11 +37,12 @@ namespace DSmoove.Core.Managers
             _trackerUpdateTimer.AutoReset = false;
             _trackerUpdateTimer.Elapsed += Update;
 
-            UpdateSubscription = new AsyncSubscription<TrackerData, TrackerManager>();
+            UpdateSubscription = new AsyncSubscription<TrackerData, IProvideTrackerUpdates>();
         }
 
-        public void Start()
+        public void Start(Guid torrentId)
         {
+            TorrentId = torrentId;
            Update(null, null);
         }
 
@@ -48,18 +54,21 @@ namespace DSmoove.Core.Managers
 
         public async Task UpdateAsync()
         {
+
+            var torrent = MemoryRepository.SingleOrDefault<Torrent>(t => t.Id == TorrentId);
+
             log.Debug("Starting tracker update...");
             _trackerUpdateTimer.Stop();
-            UriQueryBuilder builder = new UriQueryBuilder(_torrent.Metadata.Announce);
+            UriQueryBuilder builder = new UriQueryBuilder(torrent.Metadata.Announce);
 
-            var infoHash = HttpUtility.UrlEncode(_torrent.Metadata.Hash);
+            var infoHash = HttpUtility.UrlEncode(torrent.Metadata.Hash);
 
             builder.QueryString.Add("info_hash", infoHash);
             builder.QueryString.Add("peer_id", Settings.General.PeerId);
             builder.QueryString.Add("port", Settings.Connection.ListeningPort.ToString());
-            builder.QueryString.Add("left", _torrent.RemainingBytes.ToString());
-            builder.QueryString.Add("uploaded", _torrent.UploadedBytes.ToString());
-            builder.QueryString.Add("downloaded", _torrent.DownloadedBytes.ToString());
+            builder.QueryString.Add("left", torrent.RemainingBytes.ToString());
+            builder.QueryString.Add("uploaded", torrent.UploadedBytes.ToString());
+            builder.QueryString.Add("downloaded", torrent.DownloadedBytes.ToString());
 
             WebClient client = new WebClient();
 
@@ -67,7 +76,7 @@ namespace DSmoove.Core.Managers
             var responseDictionary = BencodeUtility.DecodeDictionary(data);
 
             TrackerData trackerData = new TrackerData();
-            trackerData.InfoHash = _torrent.Metadata.Hash;
+            trackerData.InfoHash = torrent.Metadata.Hash;
 
             if (responseDictionary["peers"] is byte[])
             {

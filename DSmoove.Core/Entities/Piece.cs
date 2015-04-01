@@ -21,8 +21,12 @@ namespace DSmoove.Core.Entities
 
         public PieceStatus Status { get; set; }
 
-        public Piece(long firstByte, long length)
+        public Guid TorrentId { get; private set; }
+
+        public Piece(Guid torrentId, long firstByte, long length)
         {
+            TorrentId = torrentId;
+
             Blocks = new List<Block>();
             Range = new DataRange(firstByte, length);
             BuildBlocks();
@@ -99,6 +103,7 @@ namespace DSmoove.Core.Entities
         Initial,
         Downloading,
         PartiallyDownloaded,
+        Queued,
         Downloaded,
         Verified,
         Completed

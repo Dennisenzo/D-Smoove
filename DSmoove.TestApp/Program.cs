@@ -21,16 +21,15 @@ namespace DSmoove.TestApp
         public static void Main(string[] args)
         {
             UriTorrentProvider provider = new UriTorrentProvider(new Uri("http://www.nyaa.se/?page=download&tid=665880"));
-            TorrentManager torrentJob = new TorrentManager();
-            
+
             IKernel kernel = new StandardKernel(new IocModule());
             var torrentManager = kernel.Get<TorrentManager>();
-            
-            torrentJob.Load(provider);
+
+            torrentManager.Load(provider);
 
             Console.ReadKey();
 
-            torrentJob.Stop();
+            torrentManager.Stop();
         }
     }
 }

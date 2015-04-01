@@ -1,4 +1,5 @@
 ﻿using DSmoove.Core.Interfaces;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +10,24 @@ namespace DSmoove.Core.Managers
 {
     public class TransferManager
     {
-        private UploadManager _upload;
-        private DownloadManager _download;
-        private ConnectionManager _connection;
+        [Inject]
+        public UploadManager UploadManager { get; set; }
 
-        public TransferManager(IProvideTrackerUpdates trackerUpdateProvider)
+                [Inject]
+        public DownloadManager DownloadManager { get; set; }
+
+                [Inject]
+        public ConnectionManager ConnectionManager { get; set; }
+
+        public TransferManager()
         {
-            _connection = new ConnectionManager(trackerUpdateProvider);
-            _upload = new UploadManager(_connection);
-            _download = new DownloadManager(_connection);
         }
 
         public void Start()
         {
-            _connection.Start();
-            _download.Start();
-            _upload.Start();
+            ConnectionManager.Start();
+            UploadManager.Start();
+            DownloadManager.Start();
         }
     }
 }

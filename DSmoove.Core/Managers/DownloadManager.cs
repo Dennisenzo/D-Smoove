@@ -1,5 +1,6 @@
 ﻿using DSmoove.Core.Enums;
 using DSmoove.Core.Interfaces;
+using Ninject;
 using Stateless;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,12 @@ namespace DSmoove.Core.Managers
     public class DownloadManager : BaseDataManager
     {
         private StateMachine<DownloadState, DownloadTrigger> _stateMachine;
-        private IProvidePeers _peerProvider;
 
-        public DownloadManager(IProvidePeers peerProvider)
+        [Inject]
+        public IProvidePeerConnections PeerProvider { get; set; }
+
+        public DownloadManager()
         {
-            _peerProvider = peerProvider;
         }
 
         public void Start()

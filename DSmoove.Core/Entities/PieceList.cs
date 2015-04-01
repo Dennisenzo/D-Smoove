@@ -12,6 +12,7 @@ namespace DSmoove.Core.Entities
 
         public IEnumerable<Piece> All { get { return _pieces; } }
         public IEnumerable<Piece> Waiting { get { return _pieces.Where(p => p.Status == PieceStatus.Initial || p.Status == PieceStatus.PartiallyDownloaded); } }
+        public IEnumerable<Piece> Queued { get { return _pieces.Where(p => p.Status == PieceStatus.Queued); } }
         public IEnumerable<Piece> Downloaded { get { return _pieces.Where(p => p.Status == PieceStatus.Downloaded); } }
         public IEnumerable<Piece> Verified { get { return _pieces.Where(p => p.Status == PieceStatus.Verified); } }
 

@@ -17,6 +17,9 @@ namespace DSmoove.Core.Interfaces
         void SendInterestedCommand(InterestedCommand command);
         void SendNotInterestedCommand(NotInterestedCommand command);
 
+        AsyncSubscription<IHandlePeerConnection> PeerConnectedSubscription { get; }
+        AsyncSubscription<IHandlePeerConnection> PeerDisconnectedSubscription { get; }
+
         AsyncSubscription<IHandlePeerConnection, HandshakeCommand> HandshakeCommandSubscription { get; }
         AsyncSubscription<IHandlePeerConnection, PortCommand> PortCommandSubscription { get; }
         AsyncSubscription<IHandlePeerConnection, ChokeCommand> ChokeCommandSubscription { get; }
