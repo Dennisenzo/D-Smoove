@@ -3,7 +3,9 @@ using DSmoove.Core.Entities;
 using DSmoove.Core.Helpers;
 using DSmoove.Core.Interfaces;
 using DSmoove.Core.PeerCommands;
+using EasyMemoryRepository;
 using log4net;
+using Ninject;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -27,6 +29,8 @@ namespace DSmoove.Core.Handlers
         public int Port { get; private set; }
         public string PeerId { get; private set; }
 
+        public PeerData PeerData { get; private set; }
+
         private byte[] _infoHash;
 
         private PeerConnection _peerConnection;
@@ -35,11 +39,14 @@ namespace DSmoove.Core.Handlers
 
         public ConcurrentQueue<BasePeerCommand> CommandQueue { get; set; }
 
+        [Inject]
+        public MemoryRepository MemoryRepository { get; set; }
+
         #endregion
 
         #region Constructors
 
-        public PeerHandler(IPAddress ipAddress, int port, string peerId, byte[] infoHash)
+        public PeerHandler(Guid torrentId, IPAddress ipAddress, int port, string peerId)
         {
             _peerConnection = new PeerConnection(ipAddress, port);
             _peerConnection.PeerHandshakeSubscription.Subscribe(HandleHandshakeMessage);
@@ -47,11 +54,15 @@ namespace DSmoove.Core.Handlers
             _peerConnection.PeerConnectedSubscription.Subscribe(PeerConnected);
             _peerConnection.PeerDisconnectedSubscription.Subscribe(PeerDisconnected);
 
-            IPAddress = ipAddress;
-            Port = port;
+                        var torrent = MemoryRepository.SingleOrDefault<Torrent>(t => t.Id == torrentId);
 
-            PeerId = peerId;
-            _infoHash = infoHash;
+            PeerData = new PeerData();
+            PeerData.IpAddress = ipAddress;
+            PeerData.Port = port;
+            PeerData.PeerId = peerId;
+            PeerData.BitField = new BitArray(torrent.Pieces.Count);
+
+                _infoHash = torrent.Metadata.Hash;
 
             PeerConnectedSubscription = new AsyncSubscription<IHandlePeerConnection>();
             PeerDisconnectedSubscription = new AsyncSubscription<IHandlePeerConnection>();
@@ -154,6 +165,8 @@ namespace DSmoove.Core.Handlers
 
                             bitField.FromByteArray(messageData);
 
+                            BitFieldCommandSubscription.Trigger(this, bitField);
+
                             //Peer.BitField = bitField.Downloaded;
 
                             //  log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
@@ -170,11 +183,9 @@ namespace DSmoove.Core.Handlers
 
                             have.FromByteArray(messageData);
 
-                            //   Peer.SetDownloaded(have.PieceIndex);
+                            PeerData.SetDownloaded(have.PieceIndex);
 
-                            //    log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
-
-
+                            HaveCommandSubscription.Trigger(this, have);
 
                             break;
                         }

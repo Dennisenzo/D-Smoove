@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Managers
 {
-    public class UploadManager : BaseDataManager
+    public class UploadManager 
     {
         private IProvidePeerConnections _peerProvider;
 

@@ -9,24 +9,14 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Entities
 {
-    public class Peer
+    public class PeerData
     {
-        public IPAddress IpAddress { get; private set; }
-        public int Port { get; private set; }
+        public IPAddress IpAddress { get; set; }
+        public int Port { get; set; }
 
-        public Guid Id { get; private set; }
+        public string PeerId { get; set; }
 
         public BitArray BitField { get; set; }
-      
-        public PeerStatus Status { get; set; }
-
-        public Peer(IPAddress ipAddress, int port, int pieces)
-        {
-            IpAddress = ipAddress;
-            Port = port;
-            Id = Guid.NewGuid();
-            BitField = new BitArray(pieces, false);
-        }
 
         public void SetDownloaded(int index)
         {
@@ -37,7 +27,7 @@ namespace DSmoove.Core.Entities
         {
             bool[] downloaded = new bool[BitField.Length];
 
-            BitField.CopyTo(downloaded,0);
+            BitField.CopyTo(downloaded, 0);
 
             double total = downloaded.Length;
             double numberDownloaded = 0;
@@ -57,7 +47,7 @@ namespace DSmoove.Core.Entities
         {
             List<int> interestedPieces = new List<int>();
 
-            for (int i = 0; i < bitField.Count;i++)
+            for (int i = 0; i < bitField.Count; i++)
             {
                 bool bit = bitField[i];
 
@@ -69,22 +59,5 @@ namespace DSmoove.Core.Entities
             return interestedPieces;
         }
 
-        public bool Equals(Peer other)
-        {
-            return Id.Equals(other.Id);
-        }
-
-        public bool Equals(IPAddress address, int port)
-        {
-            return address.Equals(IpAddress) && port.Equals(Port);
-        }
-    }
-
-    public enum PeerStatus
-    {
-        Disconnected,
-        Connecting,
-        Connected,
-        Failed
     }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DSmoove.Core.Managers
 {
-    public class DownloadManager : BaseDataManager
+    public class DownloadManager 
     {
         private StateMachine<DownloadState, DownloadTrigger> _stateMachine;
 
@@ -19,16 +19,60 @@ namespace DSmoove.Core.Managers
 
         public DownloadManager()
         {
+            ConfigureStateMachine();
         }
 
-        public void Start()
+        private void ConfigureStateMachine()
         {
-            //   _stateMachine.Fire(DownloadTrigger.Start);
+            _stateMachine = new StateMachine<DownloadState, DownloadTrigger>(DownloadState.Stopped);
+            _stateMachine.Configure(DownloadState.Stopped)
+                .OnEntry(() => Stop())
+                .Permit(DownloadTrigger.Start, DownloadState.Started);
+
+            _stateMachine.Configure(DownloadState.Started)
+                .OnEntry(() => Start())
+                .Permit(DownloadTrigger.Stop, DownloadState.Stopped);
         }
 
-        public void Stop()
+        public void StartManager()
         {
-            //  _stateMachine.Fire(DownloadTrigger.Start);
+               _stateMachine.Fire(DownloadTrigger.Start);
+        }
+
+        public void StopManager()
+        {
+              _stateMachine.Fire(DownloadTrigger.Start);
+        }
+
+        private void Start()
+        {
+            PeerProvider.PeerReadyForDownloadSubscription.Subscribe(PeerConnected);
+        }
+
+        private void Stop()
+
+        { }
+
+        private void PeerConnected(IHandlePeerDownloads peer, IProvidePeerConnections source)
+        {
+            peer.BitFieldCommandSubscription.Subscribe(BitfieldReceived);
+            peer.HaveCommandSubscription.Subscribe(HaveReceived);
+            peer.PieceCommandSubscription.Subscribe(PieceReceived);
+        }
+
+        private void PieceReceived(IHandlePeerDownloads arg1, PeerCommands.PieceCommand arg2)
+        {
+            
+        }
+
+        private void HaveReceived(IHandlePeerDownloads arg1, PeerCommands.HaveCommand arg2)
+        {
+         
+        }
+
+        private void BitfieldReceived(IHandlePeerDownloads arg1, PeerCommands.BitFieldCommand arg2)
+        {
+         
         }
     }
 }

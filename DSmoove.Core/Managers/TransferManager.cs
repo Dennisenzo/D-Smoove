@@ -13,10 +13,10 @@ namespace DSmoove.Core.Managers
         [Inject]
         public UploadManager UploadManager { get; set; }
 
-                [Inject]
+        [Inject]
         public DownloadManager DownloadManager { get; set; }
 
-                [Inject]
+        [Inject]
         public ConnectionManager ConnectionManager { get; set; }
 
         public TransferManager()
@@ -27,7 +27,7 @@ namespace DSmoove.Core.Managers
         {
             ConnectionManager.Start();
             UploadManager.Start();
-            DownloadManager.Start();
+            DownloadManager.StartManager();
         }
     }
 }

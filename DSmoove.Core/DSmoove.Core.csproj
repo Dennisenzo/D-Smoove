@@ -86,7 +86,7 @@
     <Compile Include="Entities\TorrentFile.cs" />
     <Compile Include="Entities\FilePart.cs" />
     <Compile Include="Entities\Metadata.cs" />
-    <Compile Include="Entities\Peer.cs" />
+    <Compile Include="Entities\PeerData.cs" />
     <Compile Include="Entities\Piece.cs" />
     <Compile Include="Entities\Torrent.cs" />
     <Compile Include="Entities\TrackerData.cs" />
@@ -102,7 +102,6 @@
     <Compile Include="Interfaces\IProvidePeerMessages.cs" />
     <Compile Include="Interfaces\IHandlePeerUploads.cs" />
     <Compile Include="Interfaces\IProvideTrackerUpdates.cs" />
-    <Compile Include="Managers\BaseDataManager.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\FileManager.cs" />

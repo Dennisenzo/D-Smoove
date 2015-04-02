@@ -54,7 +54,6 @@ namespace DSmoove.Core.Managers
 
         public async Task UpdateAsync()
         {
-
             var torrent = MemoryRepository.SingleOrDefault<Torrent>(t => t.Id == TorrentId);
 
             log.Debug("Starting tracker update...");

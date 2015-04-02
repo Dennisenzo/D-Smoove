@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSmoove.Core.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,10 @@ namespace DSmoove.Core.Interfaces
 {
     public interface IProvidePeerConnections
     {
+        AsyncSubscription<IHandlePeerConnection> PeerAddedSubscription { get; }
+        AsyncSubscription<IHandlePeerDownloads, IProvidePeerConnections> PeerReadyForDownloadSubscription { get; }
+        AsyncSubscription<IHandlePeerUploads, IProvidePeerConnections> PeerReadyForUploadSubscription { get; }
+
+        IEnumerable<IHandlePeerDownloads> DownloadHandlers { get; }
     }
 }

@@ -10,6 +10,8 @@ namespace DSmoove.Core.PeerCommands
     {
         public PeerCommandId MessageId { get; protected set; }
 
+        private ASCIIEncoding _encoding;
+
         public abstract byte[] ToByteArray();
 
         public virtual void FromByteArray(byte[] data)
@@ -23,13 +25,15 @@ namespace DSmoove.Core.PeerCommands
         public BasePeerCommand(PeerCommandId messageId)
         {
             MessageId = messageId;
+
+            _encoding = new ASCIIEncoding();
         }
 
         protected virtual byte[] ToByteArray(bool addDefaultValues, params object[] items)
         {
             List<byte> tempData = new List<byte>();
 
-            ASCIIEncoding encoding = new ASCIIEncoding();
+
 
             if (addDefaultValues)
             {
@@ -40,7 +44,7 @@ namespace DSmoove.Core.PeerCommands
             {
                 if (item is string)
                 {
-                    tempData.AddRange(encoding.GetBytes(item as string));
+                    tempData.AddRange(_encoding.GetBytes(item as string));
                 }
                 else if (item is int)
                 {
