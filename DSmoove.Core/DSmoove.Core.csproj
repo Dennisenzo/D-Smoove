@@ -106,6 +106,7 @@
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\FileManager.cs" />
     <Compile Include="Managers\MetadataManager.cs" />
+    <Compile Include="Managers\NewPieceManager.cs" />
     <Compile Include="Managers\PieceManager.cs" />
     <Compile Include="Managers\TransferManager.cs" />
     <Compile Include="Managers\UploadManager.cs" />
