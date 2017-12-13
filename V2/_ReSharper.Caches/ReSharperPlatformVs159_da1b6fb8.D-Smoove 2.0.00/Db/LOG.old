@@ -1,0 +1,86 @@
+2017/12/13-11:01:18.956 3a9e4 Recovering log #139
+2017/12/13-11:01:18.958 3a9e4 Level-0 table #144: started
+2017/12/13-11:01:18.967 3a9e4 Level-0 table #144: 985373 bytes OK
+2017/12/13-11:01:18.974 3a9e4 Delete type=0 #139
+2017/12/13-11:01:18.975 3a9e4 Delete type=3 #93
+2017/12/13-11:01:26.944 36ad4 Compacting 1@0 + 2@1 files
+2017/12/13-11:01:26.947 36ad4 Generated table #146: 413 keys, 31660 bytes
+2017/12/13-11:01:26.955 36ad4 Generated table #147: 330 keys, 266014 bytes
+2017/12/13-11:01:26.955 36ad4 Compacted 1@0 + 2@1 files => 297674 bytes
+2017/12/13-11:01:26.956 36ad4 Delete type=2 #141
+2017/12/13-11:01:26.956 36ad4 Delete type=2 #142
+2017/12/13-11:01:26.956 36ad4 Delete type=2 #144
+2017/12/13-11:01:26.956 36ad4 compacted to: files[ 0 2 19 0 0 0 0 ]
+2017/12/13-11:33:30.377 36ad4 Compacting 1@1 + 1@2 files
+2017/12/13-11:33:30.395 36ad4 Generated table #148: 5136 keys, 2044858 bytes
+2017/12/13-11:33:30.395 36ad4 Compacted 1@1 + 1@2 files => 2044858 bytes
+2017/12/13-11:33:30.396 36ad4 Delete type=2 #132
+2017/12/13-11:33:30.396 36ad4 Delete type=2 #146
+2017/12/13-11:33:30.397 36ad4 compacted to: files[ 0 1 19 0 0 0 0 ]
+2017/12/13-11:33:30.597 36ad4 Compacting 1@1 + 2@2 files
+2017/12/13-11:33:30.620 36ad4 Generated table #149: 2060 keys, 4017268 bytes
+2017/12/13-11:33:30.625 36ad4 Generated table #150: 725 keys, 516134 bytes
+2017/12/13-11:33:30.625 36ad4 Compacted 1@1 + 2@2 files => 4533402 bytes
+2017/12/13-11:33:30.626 36ad4 Delete type=2 #126
+2017/12/13-11:33:30.627 36ad4 Delete type=2 #127
+2017/12/13-11:33:30.627 36ad4 Delete type=2 #147
+2017/12/13-11:33:30.628 36ad4 compacted to: files[ 0 0 19 0 0 0 0 ]
+2017/12/13-12:07:58.975 36ad4 Level-0 table #152: started
+2017/12/13-12:07:59.011 36ad4 Level-0 table #152: 3981015 bytes OK
+2017/12/13-12:07:59.013 36ad4 Delete type=0 #145
+2017/12/13-12:14:14.880 36ad4 Level-0 table #154: started
+2017/12/13-12:14:14.901 36ad4 Level-0 table #154: 4106575 bytes OK
+2017/12/13-12:14:14.902 36ad4 Delete type=0 #151
+2017/12/13-12:14:18.076 36ad4 Compacting 2@0 + 0@1 files
+2017/12/13-12:14:18.081 36ad4 Generated table #155: 289 keys, 245587 bytes
+2017/12/13-12:14:18.090 36ad4 Generated table #156: 701 keys, 226724 bytes
+2017/12/13-12:14:18.090 36ad4 Compacted 2@0 + 0@1 files => 472311 bytes
+2017/12/13-12:14:18.091 36ad4 Delete type=2 #152
+2017/12/13-12:14:18.091 36ad4 Delete type=2 #154
+2017/12/13-12:14:18.092 36ad4 compacted to: files[ 0 2 19 0 0 0 0 ]
+2017/12/13-12:14:20.741 36ad4 Compacting 1@1 + 1@2 files
+2017/12/13-12:14:20.759 36ad4 Generated table #157: 5112 keys, 2147686 bytes
+2017/12/13-12:14:20.763 36ad4 Generated table #158: 219 keys, 114044 bytes
+2017/12/13-12:14:20.763 36ad4 Compacted 1@1 + 1@2 files => 2261730 bytes
+2017/12/13-12:14:20.764 36ad4 Delete type=2 #148
+2017/12/13-12:14:20.765 36ad4 Delete type=2 #155
+2017/12/13-12:14:20.765 36ad4 compacted to: files[ 0 1 20 0 0 0 0 ]
+2017/12/13-12:21:49.728 36ad4 Level-0 table #160: started
+2017/12/13-12:21:49.750 36ad4 Level-0 table #160: 4125026 bytes OK
+2017/12/13-12:21:49.751 36ad4 Delete type=0 #153
+2017/12/13-12:21:52.693 36ad4 Compacting 1@0 + 1@1 files
+2017/12/13-12:21:52.697 36ad4 Generated table #161: 201 keys, 140952 bytes
+2017/12/13-12:21:52.701 36ad4 Generated table #162: 742 keys, 250684 bytes
+2017/12/13-12:21:52.701 36ad4 Compacted 1@0 + 1@1 files => 391636 bytes
+2017/12/13-12:21:52.702 36ad4 Delete type=2 #156
+2017/12/13-12:21:52.703 36ad4 Delete type=2 #160
+2017/12/13-12:21:52.704 36ad4 compacted to: files[ 0 2 20 0 0 0 0 ]
+2017/12/13-12:23:05.514 36ad4 Compacting 1@1 + 1@2 files
+2017/12/13-12:23:05.531 36ad4 Generated table #163: 5044 keys, 2060562 bytes
+2017/12/13-12:23:05.531 36ad4 Compacted 1@1 + 1@2 files => 2060562 bytes
+2017/12/13-12:23:05.532 36ad4 Delete type=2 #157
+2017/12/13-12:23:05.533 36ad4 Delete type=2 #161
+2017/12/13-12:23:05.533 36ad4 compacted to: files[ 0 1 20 0 0 0 0 ]
+2017/12/13-12:28:54.002 36ad4 Compacting 1@1 + 2@2 files
+2017/12/13-12:28:54.023 36ad4 Generated table #164: 2081 keys, 4022976 bytes
+2017/12/13-12:28:54.030 36ad4 Generated table #165: 776 keys, 530282 bytes
+2017/12/13-12:28:54.030 36ad4 Compacted 1@1 + 2@2 files => 4553258 bytes
+2017/12/13-12:28:54.031 36ad4 Delete type=2 #149
+2017/12/13-12:28:54.031 36ad4 Delete type=2 #150
+2017/12/13-12:28:54.032 36ad4 Delete type=2 #162
+2017/12/13-12:28:54.032 36ad4 compacted to: files[ 0 0 20 0 0 0 0 ]
+2017/12/13-12:35:23.666 36ad4 Level-0 table #167: started
+2017/12/13-12:35:23.684 36ad4 Level-0 table #167: 4068010 bytes OK
+2017/12/13-12:35:23.685 36ad4 Delete type=0 #159
+2017/12/13-12:37:15.932 36ad4 Compacting 1@0 + 0@1 files
+2017/12/13-12:37:15.942 36ad4 Generated table #168: 218 keys, 229628 bytes
+2017/12/13-12:37:15.949 36ad4 Generated table #169: 229 keys, 140772 bytes
+2017/12/13-12:37:15.949 36ad4 Compacted 1@0 + 0@1 files => 370400 bytes
+2017/12/13-12:37:15.953 36ad4 Delete type=2 #167
+2017/12/13-12:37:15.953 36ad4 compacted to: files[ 0 2 20 0 0 0 0 ]
+2017/12/13-12:37:19.109 36ad4 Compacting 1@1 + 1@2 files
+2017/12/13-12:37:19.128 36ad4 Generated table #170: 5116 keys, 2148949 bytes
+2017/12/13-12:37:19.128 36ad4 Compacted 1@1 + 1@2 files => 2148949 bytes
+2017/12/13-12:37:19.131 36ad4 Delete type=2 #163
+2017/12/13-12:37:19.132 36ad4 Delete type=2 #168
+2017/12/13-12:37:19.132 36ad4 compacted to: files[ 0 1 20 0 0 0 0 ]

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bencode" Version="1.1.0" />
+    <PackageReference Include="LiteDB" Version="4.0.0" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net.Appender.LiteDB" Version="1.0.1" />
+    <PackageReference Include="MemBus" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Peers\Commands\" />
+  </ItemGroup>
+
+</Project>

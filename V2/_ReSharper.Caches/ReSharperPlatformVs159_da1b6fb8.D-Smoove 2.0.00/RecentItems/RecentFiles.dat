@@ -1,0 +1,65 @@
+﻿<RecentFiles>
+  <RecentFiles>
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:PieceCommand.cs" caret="179" fromTop="5" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:CancelCommand.cs" caret="312" fromTop="12" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:ChokeCommand.cs" caret="0" fromTop="0" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:NetworkStreamExtensions.cs" caret="0" fromTop="0" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerConnectionStatus.cs" caret="0" fromTop="0" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Data/d:Repositories/f:TorrentRepository.cs" caret="284" fromTop="10" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Data/d:Repositories/f:SettingsRepository.cs" caret="238" fromTop="0" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:HandshakeCommand.cs" caret="1258" fromTop="5" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:PortCommand.cs" caret="306" fromTop="12" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Data/d:Entities/f:Settings.cs" caret="191" fromTop="8" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/d:Events/f:TrackerUpdatedEvent.cs" caret="238" fromTop="10" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/f:Bus.cs" caret="387" fromTop="16" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/d:Events/f:BaseEvent.cs" caret="221" fromTop="6" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/d:Events/f:PeerConnectedEvent.cs" caret="402" fromTop="13" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/d:Events/f:PeerMessageReceivedEvent.cs" caret="342" fromTop="9" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:log4net.config" caret="737" fromTop="20" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:BasePeerCommand.cs" caret="523" fromTop="17" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/d:Commands/f:BitFieldCommand.cs" caret="452" fromTop="9" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/d:Events/f:ReceivedPeerCommandEvent.cs" caret="467" fromTop="11" />
+    <File id="7020124F-9FFC-4AC3-8F3D-AAB8E0240759/f:BitArray.cs/l:..?..?..?..?AppData?Local?JetBrains?Shared?v09?DecompilerCache?decompiler?0279B6E2-D194-4600-B7FB-29D814B3491E?76?da3fcb54?BitArray.cs" caret="598" fromTop="9" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerData.cs" caret="129" fromTop="6" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Data/d:Entities/f:Torrent.cs" caret="583" fromTop="8" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerConnection.cs" caret="1280" fromTop="8" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="2268" fromTop="25" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Trackers/f:TrackerData.cs" caret="135" fromTop="6" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Data/f:StaticSettings.cs" caret="472" fromTop="10" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Trackers/f:TrackerHandler.cs" caret="4435" fromTop="80" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:Program.cs" caret="1716" fromTop="14" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Files/f:FileHandler.cs" caret="1115" fromTop="16" />
+  </RecentFiles>
+  <RecentEdits>
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerConnection.cs" caret="1657" fromTop="12" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="6631" fromTop="14" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="2360" fromTop="8" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerConnection.cs" caret="4781" fromTop="9" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Infrastructure/d:Events/f:PeerMessageReceivedEvent.cs" caret="342" fromTop="9" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerConnection.cs" caret="4614" fromTop="12" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerConnection.cs" caret="4240" fromTop="11" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:Program.cs" caret="633" fromTop="14" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:log4net.config" caret="345" fromTop="8" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:log4net.config" caret="737" fromTop="20" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerData.cs" caret="664" fromTop="15" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="1696" fromTop="15" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="1603" fromTop="10" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="1773" fromTop="14" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="1944" fromTop="18" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="3120" fromTop="21" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Trackers/f:TrackerHandler.cs" caret="3586" fromTop="21" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Trackers/f:TrackerHandler.cs" caret="4112" fromTop="14" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="2538" fromTop="11" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Trackers/f:TrackerHandler.cs" caret="3931" fromTop="17" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:Program.cs" caret="1359" fromTop="20" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Peers/f:PeerHandler.cs" caret="2317" fromTop="25" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Files/f:FileHandler.cs" caret="306" fromTop="9" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:Program.cs" caret="703" fromTop="8" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Data/f:StaticSettings.cs" caret="461" fromTop="10" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Files/f:FileHandler.cs" caret="518" fromTop="8" />
+    <File id="814CF9E0-16B7-4224-97C9-AA0F07D55223/f:Program.cs" caret="1682" fromTop="10" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Files/f:FileHandler.cs" caret="1097" fromTop="17" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Files/f:FileHandler.cs" caret="1097" fromTop="18" />
+    <File id="E2A173CA-B66A-44C6-BF38-D9D61F1BD012/d:Files/f:FileHandler.cs" caret="1095" fromTop="15" />
+  </RecentEdits>
+</RecentFiles>
