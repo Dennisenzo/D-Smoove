@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Denga.Dsmoove.Engine.Peers;
+using Denga.Dsmoove.Engine.Pieces;
 using Denga.Dsmoove.Engine.Trackers;
 using LiteDB;
 
@@ -20,6 +23,8 @@ namespace Denga.Dsmoove.Engine.Data.Entities
 
 
         public List<TrackerData> Trackers { get; set; } = new List<TrackerData>();
+        public BitArray BitField { get; set; }
+        public List<Piece> Pieces { get; set; }
 
         public static Torrent FromMetaData(MetaData metaData)
         {
@@ -41,6 +46,8 @@ namespace Denga.Dsmoove.Engine.Data.Entities
         public DateTime CreationDate { get; set; }
         public byte[] Hash { get; set; }
 
+
+
         public class MetadataInfo
         {
             public long PieceLength { get; set; }
@@ -48,6 +55,8 @@ namespace Denga.Dsmoove.Engine.Data.Entities
             public bool Private { get; set; }
             public string Name { get; set; }
             public List<MetadataInfoFiles> Files { get; set; } = new List<MetadataInfoFiles>();
+
+            public long TotalBytes { get { return Files.Sum(f => f.Length); } }
 
             public class MetadataInfoFiles
             {

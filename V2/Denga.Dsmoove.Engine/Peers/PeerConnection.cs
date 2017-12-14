@@ -43,40 +43,43 @@ namespace Denga.Dsmoove.Engine.Peers
             _incoming = true;
         }
 
-        public bool Connect()
+        public void Connect()
         {
-            try
-            {
-                if (_tcpClient == null)
-                {
-                    // log.DebugFormat("Connecting to peer {0}:{1}", Address, Port);
-                    _tcpClient = new TcpClient();
-                    _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
+          Task.Factory.StartNew(async () =>
+             {
+                 try
+                 {
+                     if (_tcpClient == null)
+                     {
+                        // log.DebugFormat("Connecting to peer {0}:{1}", Address, Port);
+                        _tcpClient = new TcpClient();
+                         _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
 
-                    Bus.Instance.Publish(new PeerConnectedEvent(this));
+                         Bus.Instance.Publish(new PeerConnectedEvent(this));
 
-                    _readTask = Task.Factory.StartNew(ReadAsync);
+                         await Task.Factory.StartNew(ReadAsync);
+                     }
+
+                    // log.DebugFormat("Connected to peer {0}:{1}, starting read.", Address, Port);
+                }
+                 catch (Exception e)
+                 {
+
+                    //  log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
+                    return false;
+                 }
+
+                 if (_tcpClient.Connected)
+                 {
+                    //    await PeerConnectedSubscription.TriggerAsync(this);
+                }
+                 else
+                 {
+                    // await PeerDisconnectedSubscription.TriggerAsync(this);
                 }
 
-                // log.DebugFormat("Connected to peer {0}:{1}, starting read.", Address, Port);
-            }
-            catch (Exception e)
-            {
-
-              //  log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
-                return false;
-            }
-
-            if (_tcpClient.Connected)
-            {
-                //    await PeerConnectedSubscription.TriggerAsync(this);
-            }
-            else
-            {
-                // await PeerDisconnectedSubscription.TriggerAsync(this);
-            }
-
-            return _tcpClient.Connected;
+                 return _tcpClient.Connected;
+             });
         }
 
         public async Task SendAsync(byte[] buffer)
@@ -118,9 +121,6 @@ namespace Denga.Dsmoove.Engine.Peers
                 bytesRead = ns.ReadFullBuffer(messageBuffer);
 
                 ms.Write(messageBuffer, 0, bytesRead);
-
-                //    await PeerHandshakeSubscription.TriggerAsync(this, ms.ToArray());
-
                 ms.Seek(0, SeekOrigin.Begin);
 
                 while (true)

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace DSmoove.Core.Entities
+namespace Denga.Dsmoove.Engine.Pieces
 {
     public class Piece
     {
@@ -21,9 +20,9 @@ namespace DSmoove.Core.Entities
 
         public PieceStatus Status { get; set; }
 
-        public Guid TorrentId { get; private set; }
+        public int TorrentId { get; private set; }
 
-        public Piece(Guid torrentId, long firstByte, long length)
+        public Piece(int torrentId, long firstByte, long length)
         {
             TorrentId = torrentId;
 
@@ -42,6 +41,7 @@ namespace DSmoove.Core.Entities
                 Block block = new Block
                 {
                     Range = new DataRange(Range.FirstByte + blocksWritten, blockSize),
+                    //Data = new byte[blockSize],
                     PieceIndex = Index,
                     PieceOffset = blocksWritten
                 };

@@ -1,11 +1,4 @@
-﻿using DSmoove.Core.Connections;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DSmoove.Core.Entities
+﻿namespace Denga.Dsmoove.Engine.Pieces
 {
     public class DataRange
     {
@@ -26,7 +19,7 @@ namespace DSmoove.Core.Entities
             {
                 return true;
             }
-            else if (LastByte >= otherRange.FirstByte && LastByte <= LastByte)
+            else if (LastByte >= otherRange.FirstByte && LastByte <= otherRange.LastByte)
             {
                 return true;
             }
