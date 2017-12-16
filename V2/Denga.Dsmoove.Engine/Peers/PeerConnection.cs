@@ -49,7 +49,7 @@ namespace Denga.Dsmoove.Engine.Peers
             {
                 if (_tcpClient == null)
                 {
-                    // log.DebugFormat("Connecting to peer {0}:{1}", Address, Port);
+                     log.Debug($"Connecting to peer {PeerData.IpAddress}:{PeerData.Port}");
                     _tcpClient = new TcpClient();
                     _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
 

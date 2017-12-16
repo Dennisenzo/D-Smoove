@@ -79,7 +79,6 @@ namespace Denga.Dsmoove.Engine.Peers
        
             foreach (var peer in Torrent.Peers)
             {
-                log.Debug($"Connecting to peer {peer.PeerId}");
                 var connection = new PeerConnection(peer);
                 connection.Connect();
             }
