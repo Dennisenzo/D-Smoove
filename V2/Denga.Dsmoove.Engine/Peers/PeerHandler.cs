@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
@@ -23,6 +22,8 @@ namespace Denga.Dsmoove.Engine.Peers
 
         public PeerConnectionStatus Status { get; private set; }
 
+        public IDownloadStrategy DownloadStrategy { get; private set; }
+
         #endregion
 
         #region Constructors
@@ -30,6 +31,7 @@ namespace Denga.Dsmoove.Engine.Peers
         public PeerHandler(Torrent torrent)
         {
             Torrent = torrent;
+            DownloadStrategy = new RarestFirstStrategy(Torrent);
         }
 
         #endregion
@@ -69,6 +71,10 @@ namespace Denga.Dsmoove.Engine.Peers
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<BitFieldCommand>>(e =>
             {
                 e.Source.PeerData.BitField = e.Command.Downloaded;
+            });
+            Bus.Instance.Subscribe<ReceivedPeerCommandEvent<HaveCommand>>(e =>
+            {
+                e.Source.PeerData.SetDownloaded(e.Command.PieceIndex);
             });
         }
         
@@ -134,23 +140,13 @@ namespace Denga.Dsmoove.Engine.Peers
                         command.FromByteArray(messageData);
                         Bus.Instance.Publish(new ReceivedPeerCommandEvent<BitFieldCommand>(source, command));
 
-                        //Peer.BitField = bitField.Downloaded;
-
-                        //  log.DebugFormat("Peer {0} has downloaded {1:P2}", Peer.Id, Peer.GetPercentageDownloaded());
-
-
-
-                        break;
+                            break;
                     }
                     case PeerCommandId.Have:
                     {
                         var command = new HaveCommand();
                         command.FromByteArray(messageData);
                         Bus.Instance.Publish(new ReceivedPeerCommandEvent<HaveCommand>(source, command));
-
-                        //     PeerData.SetDownloaded(have.PieceIndex);
-
-                        //HaveCommandSubscription.Trigger(this, have);
 
                         break;
                     }

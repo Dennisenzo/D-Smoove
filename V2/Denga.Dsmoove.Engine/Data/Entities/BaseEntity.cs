@@ -1,3 +1,4 @@
+using System;
 using LiteDB;
 
 namespace Denga.Dsmoove.Engine.Data.Entities

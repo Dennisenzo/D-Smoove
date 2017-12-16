@@ -18,13 +18,7 @@ namespace DSmoove.Core.Entities
 
         public long TotalBytes { get { return Info.Files.Sum(f => f.Length); } }
 
-        public bool IsMultiFile
-        {
-            get
-            {
-                return Info.Files.Count > 1;
-            }
-        }
+        public bool IsMultiFile => Info.Files.Count > 1;
 
         public Metadata()
         {

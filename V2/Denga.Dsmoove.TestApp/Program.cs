@@ -5,6 +5,7 @@ using Denga.Dsmoove.Engine.Data.Entities;
 using Denga.Dsmoove.Engine.Data.Repositories;
 using Denga.Dsmoove.Engine.Files;
 using Denga.Dsmoove.Engine.Peers;
+using Denga.Dsmoove.Engine.Pieces;
 using Denga.Dsmoove.Engine.TorrentProviders;
 using Denga.Dsmoove.Engine.Trackers;
 using log4net;
@@ -45,10 +46,13 @@ namespace Denga.Dsmoove.TestApp
             var trackerHandler = new TrackerHandler();
             var peerHandler = new PeerHandler(torrent);
             var fileHandler = new FileHandler(torrent);
+            var pieceHandler = new PieceHandler();
 
             fileHandler.Start();
             peerHandler.Start();
+            pieceHandler.Start(torrent);
             trackerHandler.Start(torrent);
+
             
             Console.ReadKey(false);
         }
