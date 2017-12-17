@@ -1,6 +1,6 @@
-﻿using Denga.Dsmoove.Engine.Infrastructure.Events;
+﻿using Denga.Dsmoove.Engine.Peers;
 
-namespace Denga.Dsmoove.Engine.Peers
+namespace Denga.Dsmoove.Engine.Infrastructure.Events
 {
     public class PeerMessageReceivedEvent : BaseEvent
     {

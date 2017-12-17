@@ -6,9 +6,9 @@
         {
         }
 
-        public override byte[] ToByteArray()
+        public override byte[] ToByteArray() 
         {
-            throw new System.NotImplementedException();
+return new byte[0];
         }
     }
 }

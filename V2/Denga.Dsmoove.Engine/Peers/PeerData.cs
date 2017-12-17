@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using Denga.Dsmoove.Engine.Data.Entities;
 
 namespace Denga.Dsmoove.Engine.Peers
 {
@@ -19,6 +20,11 @@ namespace Denga.Dsmoove.Engine.Peers
         public bool IAmInterested { get; set; } = false;
         public bool IsInterestedInUs { get; set; } = false;
 
+
+        public PeerData(Torrent torrent)
+        {
+            BitField = new BitArray(torrent.BitField.Length);
+        }
         public void SetDownloaded(int index)
         {
             BitField.Set(index, true);

@@ -7,8 +7,10 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Denga.Dsmoove.Engine.Data.Entities;
 using Denga.Dsmoove.Engine.Infrastructure;
 using Denga.Dsmoove.Engine.Infrastructure.Events;
+using Denga.Dsmoove.Engine.Peers.Commands;
 using log4net;
 
 namespace Denga.Dsmoove.Engine.Peers
@@ -20,21 +22,46 @@ namespace Denga.Dsmoove.Engine.Peers
         private bool _incoming;
 
         public PeerData PeerData { get; private set; }
+        public Torrent Torrent { get; }
 
         private Task _readTask;
 
 
-        public PeerConnection(PeerData peerData)
+        public PeerConnection(PeerData peerData, Torrent torrent)
         {
             _incoming = false;
             PeerData = peerData;
+            Torrent = torrent;
+
+            Bus.Instance.Subscribe<PeerConnectedEvent>(e =>
+            {
+                if (e.PeerConnection == this)
+                {
+                    SendHandshake();
+                }
+            });
         }
+
+
+            private void SendHandshake()
+            {
+                Status = PeerConnectionStatus.Connected;
+
+                HandshakeCommand command = new HandshakeCommand()
+                {
+                    InfoHash = Torrent.MetaData.Hash
+                };
+
+                SendAsync(command.ToByteArray());
+            }
+
+        public PeerConnectionStatus Status { get; set; }
 
         public PeerConnection(TcpClient tcpClient)
         {
             _tcpClient = tcpClient;
 
-            PeerData = new PeerData()
+            PeerData = new PeerData(Torrent)
             {
                 IpAddress = ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address,
                 Port = ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port,
@@ -43,7 +70,7 @@ namespace Denga.Dsmoove.Engine.Peers
             _incoming = true;
         }
 
-        public bool Connect()
+        public  Task Connect()
         {
             try
             {
@@ -51,32 +78,28 @@ namespace Denga.Dsmoove.Engine.Peers
                 {
                      log.Debug($"Connecting to peer {PeerData.IpAddress}:{PeerData.Port}");
                     _tcpClient = new TcpClient();
-                    _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
+                     _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
 
                     Bus.Instance.Publish(new PeerConnectedEvent(this));
 
                     _readTask = Task.Factory.StartNew(ReadAsync);
                 }
 
-                // log.DebugFormat("Connected to peer {0}:{1}, starting read.", Address, Port);
+                 log.Debug($"Connected to peer {PeerData.IpAddress}:{PeerData.Port}, starting read.");
             }
             catch (Exception e)
             {
 
-              //  log.WarnFormat("Could not connect to {0}:{1} ({2})", Address, Port, e.Message);
-                return false;
+                log.Warn($"Could not connect to {PeerData.IpAddress}:{PeerData.Port} ({e.Message})");
+                return null;
             }
+            return _readTask;
+        }
 
-            if (_tcpClient.Connected)
-            {
-                //    await PeerConnectedSubscription.TriggerAsync(this);
-            }
-            else
-            {
-                // await PeerDisconnectedSubscription.TriggerAsync(this);
-            }
-
-            return _tcpClient.Connected;
+        public async Task SendAsync(BasePeerCommand command)
+        {
+            log.Debug($"Sending command {command.MessageId.ToString()} to  {PeerData.IpAddress}:{PeerData.Port} ");
+            await SendAsync(command.ToByteArray());
         }
 
         public async Task SendAsync(byte[] buffer)
@@ -117,7 +140,7 @@ namespace Denga.Dsmoove.Engine.Peers
 
                 bytesRead = ns.ReadFullBuffer(messageBuffer);
 
-                ms.Write(messageBuffer, 0, bytesRead);
+              await  ms.WriteAsync(messageBuffer, 0, bytesRead);
 
                 //    await PeerHandshakeSubscription.TriggerAsync(this, ms.ToArray());
 
@@ -133,7 +156,7 @@ namespace Denga.Dsmoove.Engine.Peers
 
                     if (messageLength == 0)
                     {
-                        Bus.Instance.Publish(new PeerMessageReceivedEvent(this, new byte[0]));
+                    await    Bus.Instance.PublishAsync(new PeerMessageReceivedEvent(this, new byte[0]));
                     }
                     else
                     {
@@ -141,16 +164,17 @@ namespace Denga.Dsmoove.Engine.Peers
 
                         bytesRead = ns.ReadFullBuffer(messageBuffer);
 
-                        ms.Write(messageBuffer, 0, bytesRead);
-                        Bus.Instance.Publish(new PeerMessageReceivedEvent(this, ms.ToArray()));
+                     await   ms.WriteAsync(messageBuffer, 0, bytesRead);
+                       await Bus.Instance.PublishAsync(new PeerMessageReceivedEvent(this, ms.ToArray()));
                         ms.Seek(0, SeekOrigin.Begin);
                     }
                 }
             }
             catch (IOException e)
             {
-           //     log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
-//PeerDisconnectedSubscription.Trigger(this);
+                //     log.WarnFormat("Disconnected from {0}:{1} ({2})", Address, Port, e.Message);
+                //PeerDisconnectedSubscription.Trigger(this);
+                await Bus.Instance.PublishAsync(new PeerDisconnectedEvent(this));
             }
         }
 
@@ -158,8 +182,7 @@ namespace Denga.Dsmoove.Engine.Peers
         {
             if (data.Length != 4)
             {
-                log.ErrorFormat("Error while decoding message length; expected a 4-byte buffer, but received {0} bytes",
-                    data.Length);
+                log.Error($"Error while decoding message length; expected a 4-byte buffer, but received {data.Length} bytes");
                 throw new ArgumentOutOfRangeException("data", "Expected a 4 byte data package.");
             }
             int messageLength = BitConverter.ToInt32(data.Reverse().ToArray(), 0);

@@ -85,7 +85,7 @@ namespace Denga.Dsmoove.Engine.Trackers
 
                     ushort port = (ushort) BitConverter.ToInt16(portBytes, 0);
 
-                    Torrent.Peers.Add(new PeerData()
+                    Torrent.Peers.Add(new PeerData(Torrent)
                     {
                         IpAddress = ip,
                         Port = port,
@@ -100,7 +100,7 @@ namespace Denga.Dsmoove.Engine.Trackers
                 {
                     if (peer is Dictionary<string, object> peerInfo)
                     {
-                        Torrent.Peers.Add(new PeerData()
+                        Torrent.Peers.Add(new PeerData(Torrent)
                         {
                             IpAddress = IPAddress.Parse(Encoding.Default.GetString((byte[])peerInfo["ip"])),
                             Port = int.Parse(peerInfo["port"].ToString()),

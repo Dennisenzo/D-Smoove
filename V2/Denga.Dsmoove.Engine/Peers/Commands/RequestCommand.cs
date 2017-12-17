@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Denga.Dsmoove.Engine.Pieces;
 
 namespace Denga.Dsmoove.Engine.Peers.Commands
 {
@@ -9,10 +10,16 @@ namespace Denga.Dsmoove.Engine.Peers.Commands
         public long Begin { get; set; }
         public long Length { get; set; }
 
-        public RequestCommand()
-            : base(PeerCommandId.Request)
+        public RequestCommand() : base(PeerCommandId.Request)
         {
-
+            
+        }
+        public RequestCommand(Piece piece)
+            :this()
+        {
+            Index = piece.Index;
+            Begin = piece.Range.FirstByte;
+            Length = piece.Range.Length;
         }
 
         public override byte[] ToByteArray()

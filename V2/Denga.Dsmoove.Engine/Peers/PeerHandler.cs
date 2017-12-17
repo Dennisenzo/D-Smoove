@@ -44,10 +44,7 @@ namespace Denga.Dsmoove.Engine.Peers
             {
                 ConnectToPeers();
             });
-            Bus.Instance.Subscribe<PeerConnectedEvent>(e =>
-            {
-              SendHandshake(e.PeerConnection);
-            });
+
             Bus.Instance.Subscribe<PeerMessageReceivedEvent>(e =>
             {
                 HandlePeerMessage(e.PeerConnection, e.MessageData);
@@ -59,10 +56,13 @@ namespace Denga.Dsmoove.Engine.Peers
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<UnchokeCommand>>(e =>
             {
                 e.Source.PeerData.IsChokingUs = false;
+
+                CheckQueue(e.Source);
             });
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<InterestedCommand>>(e =>
             {
                 e.Source.PeerData.IsInterestedInUs = true;
+
             });
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<NotInterestedCommand>>(e =>
             {
@@ -71,22 +71,57 @@ namespace Denga.Dsmoove.Engine.Peers
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<BitFieldCommand>>(e =>
             {
                 e.Source.PeerData.BitField = e.Command.Downloaded;
+
+                CheckQueue(e.Source);
             });
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<HaveCommand>>(e =>
             {
                 e.Source.PeerData.SetDownloaded(e.Command.PieceIndex);
+
+                CheckQueue(e.Source);
+            });
+            Bus.Instance.Subscribe<ReceivedPeerCommandEvent<PieceCommand>>(e =>
+            {
+           
+
+                CheckQueue(e.Source);
             });
         }
-        
+
+        private void CheckQueue(PeerConnection peerConnection)
+        {
+
+            bool areWeInterested = DownloadStrategy.AreWeInterested(peerConnection.PeerData);
+
+            if (areWeInterested && !peerConnection.PeerData.IAmInterested)
+            {
+                var command = new InterestedCommand();
+                peerConnection.SendAsync(command.ToByteArray());
+            }
+            if (!areWeInterested && peerConnection.PeerData.IAmInterested)
+            {
+                var command = new NotInterestedCommand();
+                peerConnection.SendAsync(command);
+            }
+            peerConnection.PeerData.IAmInterested = areWeInterested;
+
+            if (peerConnection.PeerData.IAmInterested && !peerConnection.PeerData.IsChokingUs)
+            {
+                var nextPiece = DownloadStrategy.GetNextPiece(peerConnection.PeerData);
+                var command = new RequestCommand(nextPiece);
+                peerConnection.SendAsync(command);
+            }
+
+        }
+
         #endregion
 
         public void ConnectToPeers()
         {
-       
             foreach (var peer in Torrent.Peers)
             {
-                var connection = new PeerConnection(peer);
-                connection.Connect();
+                var connection = new PeerConnection(peer,Torrent);
+             connection.Connect();
             }
         }
 
@@ -94,7 +129,7 @@ namespace Denga.Dsmoove.Engine.Peers
 
         public void HandlePeerMessage(PeerConnection source, byte[] messageData)
         {
-            if (messageData == null)
+            if (messageData == null || messageData.Length == 0)
             {
                 log.DebugFormat($"Received KeepAlive message from {source}");
             }
@@ -160,6 +195,14 @@ namespace Denga.Dsmoove.Engine.Peers
                         break;
                     }
 
+                    case PeerCommandId.Piece:
+                    {
+                        var command = new PieceCommand();
+                        command.FromByteArray(messageData);
+                        Bus.Instance.Publish(new ReceivedPeerCommandEvent<PieceCommand>(source, command));
+
+                        break;
+                    }
                     default:
                     {
                         log.Warn("Weird data received!");
@@ -169,17 +212,7 @@ namespace Denga.Dsmoove.Engine.Peers
             }
         }
 
-        private void SendHandshake(PeerConnection source)
-        {
-            Status = PeerConnectionStatus.Connected;
 
-            HandshakeCommand command = new HandshakeCommand()
-            {
-                InfoHash = Torrent.MetaData.Hash
-            };
-
-            source.SendAsync(command.ToByteArray());
-        }
 
         #endregion
     }
