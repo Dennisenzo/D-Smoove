@@ -1,0 +1,8 @@
+﻿<Application
+    x:Class="Denga.Dsmoove.Gui.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Denga.Dsmoove.Gui"
+    RequestedTheme="Light">
+
+</Application>

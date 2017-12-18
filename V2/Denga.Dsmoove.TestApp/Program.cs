@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Mime;
 using System.Reflection;
 using Denga.Dsmoove.Engine.Data.Entities;
 using Denga.Dsmoove.Engine.Data.Repositories;
@@ -10,22 +11,51 @@ using Denga.Dsmoove.Engine.TorrentProviders;
 using Denga.Dsmoove.Engine.Trackers;
 using log4net;
 using log4net.Config;
+using log4net.Repository.Hierarchy;
+using Microsoft.Extensions.DependencyInjection;
+using Ninject;
 
 namespace Denga.Dsmoove.TestApp
 {
-    class Program
+    public class Host
     {
-        static void Main(string[] args)
+        public static void Main()
         {
-            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+           
+            var serviceCollection = new ServiceCollection();
+            var serviceProvider = ConfigureServices(serviceCollection);
+            var program = new Program(serviceProvider);
+            program.Run();
 
-            var settings = new Settings
-            {
-            
-            };
+        }
 
-           //    var torrentFile = @"C:\Users\dhell\Downloads\debian-mac-9.3.0-amd64-netinst.iso.torrent";
+        private static IServiceProvider ConfigureServices(IServiceCollection serviceCollection)
+        {
+            IKernel kernel = new StandardKernel();
+
+            kernel.Bind<IServiceProvider>().ToConstant(kernel);
+
+            return kernel.Get<IServiceProvider>();
+        }
+
+        //{
+        //    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+        //    XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+        //    ILoggerFactory loggerFactory =
+        //    serviceCollection.AddSingleton<ILoggerFactory>(logRepository);
+    }
+
+
+    public class Program
+    {
+
+       
+
+        public Program(IServiceProvider provider)
+        {
+          //  provider.
+        //    ConfigureServices(serviceCollection);
+            //    var torrentFile = @"C:\Users\dhell\Downloads\debian-mac-9.3.0-amd64-netinst.iso.torrent";
 
             // var provider = new FileTorrentProvider(torrentFile);
             //   var metadata = fileTorrent.GetMetaData();
@@ -37,25 +67,28 @@ namespace Denga.Dsmoove.TestApp
             //        repo.Save(torrent);
             //    }
 
+
+
+
+
+        }
+
+        private void ConfigureServices(IServiceCollection serviceCollection)
+        {
+
+        }
+
+        public void Run()
+        {
             var provider =
                 new UriTorrentProvider(
                     new Uri("https://torrents.linuxmint.com/torrents/linuxmint-17.2-cinnamon-64bit.iso.torrent"));
             var metaData = provider.GetMetaData();
             var torrent = Torrent.FromMetaData(metaData);
-
-            var trackerHandler = new TrackerHandler();
-            var peerHandler = new PeerHandler(torrent);
-            var fileHandler = new FileHandler(torrent);
-            var pieceHandler = new PieceHandler();
-
-            fileHandler.Start();
-            peerHandler.Start();
-            pieceHandler.Start(torrent);
-            trackerHandler.Start(torrent);
+            
 
             
             Console.ReadKey(false);
         }
     }
 }
-

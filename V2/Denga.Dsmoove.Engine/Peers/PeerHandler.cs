@@ -27,20 +27,13 @@ namespace Denga.Dsmoove.Engine.Peers
 
         #endregion
 
-        #region Constructors
+        #region Public Methods
 
-        public PeerHandler(Torrent torrent)
+        public void Start(Torrent torrent)
         {
             Torrent = torrent;
             DownloadStrategy = new RarestFirstStrategy(Torrent);
-        }
 
-        #endregion
-
-        #region Public Methods
-
-        public void Start()
-        {
             Bus.Instance.Subscribe<TrackerUpdatedEvent>(e =>
             {
                 ConnectToPeers();

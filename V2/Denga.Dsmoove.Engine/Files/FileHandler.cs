@@ -10,15 +10,12 @@ namespace Denga.Dsmoove.Engine.Files
 {
     public class FileHandler
     {
-        public Torrent Torrent { get; }
+        public Torrent Torrent { get; private set; }
 
-        public FileHandler(Torrent torrent)
+        public void Start(Torrent torrent)
         {
             Torrent = torrent;
-        }
 
-        public void Start()
-        {
             Directory.CreateDirectory(StaticSettings.BaseDownloadPath);
 
             foreach (var file in Torrent.MetaData.Info.Files)
