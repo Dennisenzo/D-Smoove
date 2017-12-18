@@ -35,7 +35,7 @@ namespace Denga.Dsmoove.Engine.Peers
 
             Bus.Instance.Subscribe<PeerConnectedEvent>(e =>
             {
-                if (e.PeerConnection == this)
+                if (e.Source == this)
                 {
                     SendHandshake();
                 }
@@ -70,30 +70,31 @@ namespace Denga.Dsmoove.Engine.Peers
             _incoming = true;
         }
 
-        public  Task Connect()
+        public Task Connect()
         {
-            try
+            return Task.Factory.StartNew(() =>
             {
-                if (_tcpClient == null)
+                try
                 {
-                     log.Debug($"Connecting to peer {PeerData.IpAddress}:{PeerData.Port}");
-                    _tcpClient = new TcpClient();
-                     _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
+                    if (_tcpClient == null)
+                    {
+                        log.Debug($"Connecting to peer {PeerData.IpAddress}:{PeerData.Port}");
+                        _tcpClient = new TcpClient();
+                        _tcpClient.Connect(PeerData.IpAddress, PeerData.Port);
 
-                    Bus.Instance.Publish(new PeerConnectedEvent(this));
+                        Bus.Instance.Publish(new PeerConnectedEvent(this));
 
-                    _readTask = Task.Factory.StartNew(ReadAsync);
+                        _readTask = Task.Factory.StartNew(ReadAsync);
+                    }
+
+                    log.Debug($"Connected to peer {PeerData.IpAddress}:{PeerData.Port}, starting read.");
                 }
+                catch (Exception e)
+                {
 
-                 log.Debug($"Connected to peer {PeerData.IpAddress}:{PeerData.Port}, starting read.");
-            }
-            catch (Exception e)
-            {
-
-                log.Warn($"Could not connect to {PeerData.IpAddress}:{PeerData.Port} ({e.Message})");
-                return null;
-            }
-            return _readTask;
+                   // log.Warn($"Could not connect to {PeerData.IpAddress}:{PeerData.Port} ({e.Message})");
+                }
+            });
         }
 
         public async Task SendAsync(BasePeerCommand command)
@@ -142,7 +143,10 @@ namespace Denga.Dsmoove.Engine.Peers
 
               await  ms.WriteAsync(messageBuffer, 0, bytesRead);
 
-                //    await PeerHandshakeSubscription.TriggerAsync(this, ms.ToArray());
+                await Bus.Instance.PublishAsync(new PeerHandShakeReceivedEvent()
+                {
+                    Source = this
+                });
 
                 ms.Seek(0, SeekOrigin.Begin);
 

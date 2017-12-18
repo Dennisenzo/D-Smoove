@@ -10,6 +10,7 @@ using Denga.Dsmoove.Engine.Infrastructure;
 using Denga.Dsmoove.Engine.Infrastructure.Events;
 using Denga.Dsmoove.Engine.Peers.Commands;
 using log4net;
+using log4net.Repository.Hierarchy;
 
 namespace Denga.Dsmoove.Engine.Peers
 {
@@ -44,7 +45,10 @@ namespace Denga.Dsmoove.Engine.Peers
             {
                 ConnectToPeers();
             });
-
+            Bus.Instance.Subscribe<PeerHandShakeReceivedEvent>(e =>
+            {
+                SendBitField(e.Source);
+            });
             Bus.Instance.Subscribe<PeerMessageReceivedEvent>(e =>
             {
                 HandlePeerMessage(e.PeerConnection, e.MessageData);
@@ -52,6 +56,7 @@ namespace Denga.Dsmoove.Engine.Peers
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<ChokeCommand>>(e =>
             {
                 e.Source.PeerData.IsChokingUs = true;
+   
             });
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<UnchokeCommand>>(e =>
             {
@@ -82,21 +87,31 @@ namespace Denga.Dsmoove.Engine.Peers
             });
             Bus.Instance.Subscribe<ReceivedPeerCommandEvent<PieceCommand>>(e =>
             {
-           
+                log.Debug($"Received piece from {e.Source.PeerData.IpAddress}:{e.Source.PeerData.Port}");
 
                 CheckQueue(e.Source);
             });
         }
 
+        private void SendBitField(PeerConnection source)
+        {
+            var command = new BitFieldCommand()
+            {
+                Downloaded = Torrent.BitField
+            };
+            source.SendAsync(command);
+        }
+
         private void CheckQueue(PeerConnection peerConnection)
         {
-
+            log.Debug(
+                $"Checking if we should send commands to {peerConnection.PeerData.IpAddress}:{peerConnection.PeerData.Port}");
             bool areWeInterested = DownloadStrategy.AreWeInterested(peerConnection.PeerData);
 
             if (areWeInterested && !peerConnection.PeerData.IAmInterested)
             {
                 var command = new InterestedCommand();
-                peerConnection.SendAsync(command.ToByteArray());
+                peerConnection.SendAsync(command);
             }
             if (!areWeInterested && peerConnection.PeerData.IAmInterested)
             {

@@ -39,7 +39,7 @@ namespace Denga.Dsmoove.TestApp
 
             var provider =
                 new UriTorrentProvider(
-                    new Uri("https://torrents.linuxmint.com/torrents/linuxmint-17-mate-nocodecs-64bit-v2.iso.torrent"));
+                    new Uri("https://torrents.linuxmint.com/torrents/linuxmint-17.2-cinnamon-64bit.iso.torrent"));
             var metaData = provider.GetMetaData();
             var torrent = Torrent.FromMetaData(metaData);
 

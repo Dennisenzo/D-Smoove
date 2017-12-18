@@ -7,11 +7,11 @@ namespace Denga.Dsmoove.Engine.Infrastructure.Events
 {
     public class PeerConnectedEvent : BaseEvent
     {
-        public PeerConnection PeerConnection { get; set; }
+        public PeerConnection Source { get; set; }
 
         public PeerConnectedEvent(PeerConnection peerConnection)
         {
-            PeerConnection = peerConnection;
+            Source = peerConnection;
         }
     }
 }
